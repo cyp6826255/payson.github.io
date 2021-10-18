@@ -1,10 +1,10 @@
 # Site settings
-title: Chenyp Blog
-SEOTitle: 陈燕鹏的博客 | Chenyp Blog
+title: PaysonChen Blog
+SEOTitle: PaysonChen的博客 | PaysonChen Blog
 header-img: img/home-bg.jpg
 email: wangshu2013@gmail.com
 description: "与你一起发现更大的世界。"
-keyword: "陈燕鹏,PaysonChen,iOS,流媒体" #"黄玄, Hux黄玄, Hux, 鬼栈, huxpro, @huxpro, 黄玄的博客, Hux Blog, 博客, 个人网站, 互联网, Web, JavaScript, 前端, 设计"
+keyword: "PaysonChen,iOS,流媒体"
 url: "https://chenyanpeng.cn/" # your host, for absolute URL
 baseurl: ""                             # for example, '/blog' if your blog hosted on 'host/blog'
 
