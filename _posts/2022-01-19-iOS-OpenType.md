@@ -16,7 +16,7 @@ tags: []
 
 ​	通过设置Xcode Document Types，可以设置项目可接收的文件类型，附带一份：[官方提供的文件类型列表](https://developer.apple.com/library/archive/documentation/Miscellaneous/Reference/UTIRef/Articles/System-DeclaredUniformTypeIdentifiers.html#//apple_ref/doc/uid/TP40009259-SW1)。
 
-​	![](img/2022-01-19-iOS-OpenType/doctypes.png)
+​	![](/img/2022-01-19-iOS-OpenType/doctypes.png)
 
 
 
@@ -28,7 +28,7 @@ tags: []
 
   iOS13之前，Appdelegate的职责全权处理App生命周期和UI生命周期：
 
-  ![](img/2022-01-19-iOS-OpenType/appdelegate.jpg)
+  ![](/img/2022-01-19-iOS-OpenType/appdelegate.jpg)
 
   在不需要多Window场景下，在AppDelegate中实现
 
@@ -53,9 +53,9 @@ tags: []
 
 ​	iOS13之后，`Appdelegate`不在负责UI生命周期，所有UI生命周期交给`SceneDelegate`处理：
 
-![](img/2022-01-19-iOS-OpenType/scene_Appdelegate.jpg)
+![](/img/2022-01-19-iOS-OpenType/scene_Appdelegate.jpg)
 
-![](img/2022-01-19-iOS-OpenType/scene_delegate.jpg)
+![](/img/2022-01-19-iOS-OpenType/scene_delegate.jpg)
 
 在SceneDelegate场景中实现回调监听：
 
@@ -93,7 +93,7 @@ QQ分享的视频可以支持其他应用打开，导入到第三方应用
 
 Document Types Data包含关系如下：
 
-![](img/2022-01-19-iOS-OpenType/public.data.gif)
+![](/img/2022-01-19-iOS-OpenType/public.data.gif)
 
 
 
