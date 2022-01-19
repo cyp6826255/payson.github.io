@@ -1,18 +1,12 @@
 ---
 layout: post
-title: "多账号配置GIT"
+title: "iOS应用接收文件打开类型"
 subtitle: ""
-date: 2021-10-18
-author: "陈燕鹏"
-header-img: "img/post-bg-2015.jpg"
+date: 2022-01-19
+author: "PaysonChen"
+header-img: "img/home-bg-geek.jpg"
 tags: []
 ---
-
-
-
-# iOS应用接收文件打开类型
-
-
 
 ## 0x00 背景
 
