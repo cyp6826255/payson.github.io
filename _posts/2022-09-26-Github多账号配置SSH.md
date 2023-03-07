@@ -58,7 +58,25 @@ clone时 改为 git@other.github.com:nickname/web.git 即可
 git@other.github.com:nickname/web.git 
 ```
 
+## 0x04 其他问题
 
+```
+Cloning into 'yyy'...
+/Users/xxxx/.ssh/config line 21: Bad key types 'publickey'.
+/Users/xxxx/.ssh/config: terminating, 1 bad configuration options
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+```
+
+此时表示 publickey 不符合这个仓库的加密类型尝试改成
+
+```
+PubkeyAcceptedAlgorithms publickey
+=>
+PubkeyAcceptedAlgorithms +ssh-rsa
+```
 
 
 
