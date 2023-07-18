@@ -76,5 +76,6 @@ tags: []
 2. 层次分明的基础模块设计，
 3. 上层的业务模块解偶
 
-![image-20230714175707675](data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2218 896"></svg>)
+![image-20230714175707675](/img/1-1.png)
+
 
