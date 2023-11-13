@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="description" content="与你一起发现更大的世界。">
+    <meta name="keywords"  content="PaysonChen,iOS,流媒体">
+    <meta name="theme-color" content="#000000">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="iOS组件化实践之：类命名注释篇 - PaysonChen的博客 | PaysonChen Blog">
+    
+    <meta property="og:type" content="article">
+    <meta property="og:description" content="iOS组件化实践之：类命名注释篇
+">
+    
+    
+    <meta property="article:published_time" content="2023-07-31T00:00:00Z">
+    
+    
+    <meta property="article:author" content="PaysonChen">
+    
+    
+    
+    <meta property="og:image" content="http://localhost:4000">
+    <meta property="og:url" content="http://localhost:4000/2023/07/31/6-iOS-%E7%BB%84%E4%BB%B6%E5%8C%96-%E5%91%BD%E5%90%8D%E6%B3%A8%E9%87%8A%E7%AF%87/">
+    <meta property="og:site_name" content="PaysonChen的博客 | PaysonChen Blog">
+    
+    <title>iOS组件化实践之：类命名注释篇 - PaysonChen的博客 | PaysonChen Blog</title>
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/pwa/manifest.json">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/img/favicon.ico">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="http://localhost:4000/2023/07/31/6-iOS-%E7%BB%84%E4%BB%B6%E5%8C%96-%E5%91%BD%E5%90%8D%E6%B3%A8%E9%87%8A%E7%AF%87/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">PaysonChen Blog</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div id="huxblog_navbar">
+                <div class="navbar-collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="/">Home</a>
+                        </li>
+                        
+                        
+                        
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                        
+                        
+                        <li>
+                            <a href="/archive/">Archive</a>
+                        </li>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        <li class="search-icon">
+                            <a href="javascript:void(0)">
+                                <i class="fa fa-search"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <script>
+        // Drop Bootstarp low-performance Navbar
+        // Use customize navbar with high-quality material design animation
+        // in high-perf jank-free CSS3 implementation
+        var $body = document.body;
+        var $toggle = document.querySelector('.navbar-toggle');
+        var $navbar = document.querySelector('#huxblog_navbar');
+        var $collapse = document.querySelector('.navbar-collapse');
+
+        var __HuxNav__ = {
+            close: function () {
+                $navbar.className = " ";
+                // wait until animation end.
+                setTimeout(function () {
+                    // prevent frequently toggle
+                    if ($navbar.className.indexOf('in') < 0) {
+                        $collapse.style.height = "0px"
+                    }
+                }, 400)
+            },
+            open: function () {
+                $collapse.style.height = "auto"
+                $navbar.className += " in";
+            }
+        }
+
+        // Bind Event
+        $toggle.addEventListener('click', function (e) {
+            if ($navbar.className.indexOf('in') > 0) {
+                __HuxNav__.close()
+            } else {
+                __HuxNav__.open()
+            }
+        })
+
+        /**
+         * Since Fastclick is used to delegate 'touchstart' globally
+         * to hack 300ms delay in iOS by performing a fake 'click',
+         * Using 'e.stopPropagation' to stop 'touchstart' event from 
+         * $toggle/$collapse will break global delegation.
+         * 
+         * Instead, we use a 'e.target' filter to prevent handler
+         * added to document close HuxNav.  
+         *
+         * Also, we use 'click' instead of 'touchstart' as compromise
+         */
+        document.addEventListener('click', function (e) {
+            if (e.target == $toggle) return;
+            if (e.target.className == 'icon-bar') return;
+            __HuxNav__.close();
+        })
+    </script>
+    <!-- Search -->
+<div class="search-page">
+  <div class="search-icon-close-container">
+    <span class="search-icon-close">
+      <i class="fa fa-chevron-down"></i>
+    </span>
+  </div>
+  <div class="search-main container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <form></form>
+        <input type="text" id="search-input" placeholder="$ grep...">
+        </form>
+        <div id="search-results" class="mini-post-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <!-- Image to hack wechat -->
+<!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="/img/home-bg-geek.jpg" width="0" height="0"> -->
+
+<!-- Post Header -->
+
+
+
+<style type="text/css">
+    header.intro-header{
+        position: relative;
+        background-image: url('/img/home-bg-geek.jpg');
+        background: ;
+    }
+
+    
+</style>
+
+<header class="intro-header" >
+
+    <div class="header-mask"></div>
+    
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                    </div>
+                    <h1>iOS组件化实践之：类命名注释篇</h1>
+                    
+                    <h2 class="subheading"></h2>
+                    <span class="meta">Posted by PaysonChen on July 31, 2023</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <!-- Multi-Lingual -->
+                
+
+				<h1 id="ios组件化实践之类命名注释篇">iOS组件化实践之：类命名注释篇</h1>
+
+<h2 id="1问题描述">1.问题描述</h2>
+
+<p>CocoaPods组件创建时，提供的一个很好的管理命名规范的思路：以统一的命名前缀，一般以项目/组织等缩写作为前缀</p>
+
+<p>组件化规整之后，可能存在的情况是前后的文件命名不一致导致的影响代码易读性、易维护等问题</p>
+
+<p>除此之外，由于代码经由不同人迭代的，甚至不同组织迭代（从外包接手的项目）还存在一些文件注释的注释模板差异的情况</p>
+
+<h2 id="2-类命名统一">2. 类命名统一</h2>
+
+<h3 id="21-类重命名之前">2.1 类重命名之前</h3>
+
+<p>需要确认下，当前类或者与之相关的一些类，是否存在于<a href="https://cocoapods.org/">CocoaPods</a>公有源上，如果存在，可以直接通过Pod引入（组件内通过dependency），</p>
+
+<p>举个例子：如果你需要进行重命名的类是这样的：SDWebImage、SDWebImageXXX、SDXXX，显然，这是将SDWebImage通过代码直接集成，由于SDWebImage类数量比较多，且属于成熟框架，在确认没有私自改动逻辑的情况下，可以考虑直接移除，采用通过Pod引入（组件内通过dependency）</p>
+
+<p>当然，如果存在没有被用到的类，也正好是一个移除他们的好时机！</p>
+
+<p><strong>‼️特别注意：改名之前，需要确认，要改的类名是否已经存在工程中，如果存在且继续修改，会造成很多错误替换，造成很复杂的编译问题，且难以回退。</strong></p>
+
+<p>例如：ABCWebView，要改成PSCWebView，此时如果工程中已经存在PSCWebView，则ABCWebView继续再改成PSCWebView，会造成所有ABCWebView与PSCWebView的混乱，除非单次修改（之前的操作已经提交），否则回退也变得异常困难。</p>
+
+<h3 id="22-常规类重命名">2.2 常规类重命名</h3>
+
+<p>可以通过IDE：Xcode自带的rename功能进行类名重命名：</p>
+
+<p><img src="/img/name/1.png" alt="" /></p>
+
+<p>替换成带期望前缀的类名</p>
+
+<p><img src="/img/name/2.png" alt="WX20230731-191648" /></p>
+
+<p>可能存在替换不完全的可能，需要检索下旧类名，全局替换下，确保编译通过方可</p>
+
+<h3 id="23-categories重命名">2.3 categories重命名</h3>
+
+<p>categories的重命名无法根据上述方式，只能通过常规的修改文件名，以及全局替换的方式。</p>
+
+<p>值得一提的是，若一个基础类存在多个单一功能的categories，例如存在UIButton+Category1，UIButton+Category2……，他们有可能存在重复的功能可以考虑保留其中一个即可，也可以考虑将他们重构，合并，或者是重新划分下功能归属，</p>
+
+<h2 id="3类注释模板统一">3.类注释模板统一：</h2>
+
+<p>治理这些情况，可能就需要分两步：</p>
+
+<h3 id="31-第一步存量类注释规范治理">3.1 第一步：存量类注释规范治理</h3>
+
+<p>存量治理，这边采用脚本批量执行，具体思路如下：</p>
+
+<ul>
+  <li>遍历指定目录（若未传参数则为当前目录）下的子目录</li>
+  <li>匹配所有iOS工程类文件：.h .m .swift</li>
+  <li>对其注释头进行模板替换
+    <ul>
+      <li>匹配获取当前类的author，匹配不到则使用默认值（需定义）</li>
+      <li>匹配获取当前类的time，匹配不到则使用默认值（需定义）</li>
+      <li>替换版权信息（需定义）</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+</pre></td><td class="rouge-code"><pre><span class="c">#!/bin/bash</span>
+
+<span class="c"># 遍历更新当前目录下(含子目录）所有iOS工程类文件：.h .m .swift 并对其注释头进行模板替换</span>
+<span class="c"># author: Chenyp34</span>
+<span class="c"># [目的]</span>
+<span class="c">#</span>
+<span class="c"># 组件化规整之后，可能存在的情况是前后的文件命名不一致导致的影响代码易读性、易维护等问题</span>
+<span class="c"># 除此之外，由于代码经由不同人迭代的，甚至不同组织迭代（从外包接手的项目）还存在一些文件注释的注释模板差异的情况</span>
+<span class="c"># 此脚本目的为了解决存量类文件头注释统一性问题</span>
+<span class="c">#</span>
+<span class="c"># [目录]</span>
+<span class="c">#   - replace_class_header_anotation.sh 遍历更新当前目录下，子目录git仓库的脚本</span>
+<span class="c">#</span>
+<span class="c"># [说明]</span>
+<span class="c"># 1、遍历指定目录（若未传参数则为当前目录）下的子目录</span>
+<span class="c"># 2、匹配所有iOS工程类文件：.h .m .swift</span>
+<span class="c"># 3、对其注释头进行模板替换</span>
+<span class="c">#</span>
+<span class="c"># [参数]</span>
+<span class="c"># 1、参数1，指定目录</span>
+<span class="c">#</span>
+<span class="c"># [调用说明]</span>
+<span class="c"># 1、未指定目录，则取当前目录：sh replace_class_header_anotation.sh</span>
+<span class="c"># 2、指定目录：sh replace_class_header_anotation.sh /User/xxx/xx</span>
+<span class="c"># 本脚本适用于将：下述注释替换成 统一注释模板：</span>
+<span class="c">#   其一：</span>
+<span class="c">#//</span>
+<span class="c">#//  FileName.h</span>
+<span class="c">#//  ProjectName</span>
+<span class="c">#//</span>
+<span class="c">#//  Created by Author on Date.</span>
+<span class="c">#// (没版权信息)</span>
+<span class="c">#//</span>
+<span class="c">#</span>
+<span class="c">#   其二：</span>
+<span class="c">#   /****************************************************************************************************</span>
+<span class="c">#   * 版权所有： Copyright (c) 2012-2021 xxxx. All rights reserved.</span>
+<span class="c">#   * 作 者： Author （2021/3/12）</span>
+<span class="c">#   * 界面描述：  界面描述</span>
+<span class="c">#   ****************************************************************************************************/</span>
+<span class="c">#</span>
+<span class="c">#   其三：</span>
+<span class="c">#   没有任何注释的</span>
+<span class="c">#</span>
+<span class="c">#</span>
+<span class="c">#   替换成统一注释模板：</span>
+<span class="c">#</span>
+<span class="c">#//</span>
+<span class="c">#//  "$filename"</span>
+<span class="c">#//  "$project_name"</span>
+<span class="c">#//</span>
+<span class="c">#//  Created by "$auth" on "$date".</span>
+<span class="c">#//  "$copyright_str"</span>
+<span class="c">#//</span>
+<span class="c">#</span>
+<span class="c">#定义版权信息</span>
+<span class="nb">export </span><span class="nv">copyright_str</span><span class="o">=</span><span class="s2">"Copyright (C) 2023 Your Company Name Technology Limited. All rights reserved."</span>
+
+<span class="c">#定义默认用户信息：PaysonChen</span>
+<span class="nb">export </span><span class="nv">def_author_str</span><span class="o">=</span><span class="s2">"PaysonChen"</span>
+
+<span class="c">#定义默认日期：当前日期</span>
+<span class="nb">export </span><span class="nv">def_time_str</span><span class="o">=</span><span class="sb">`</span><span class="nb">date</span> +%Y/%m/%d<span class="sb">`</span>
+
+<span class="k">function </span>get_creator_name_with_template_2<span class="o">()</span> <span class="o">{</span>
+    <span class="nv">file</span><span class="o">=</span><span class="nv">$1</span>
+    <span class="nv">creator_name</span><span class="o">=</span><span class="si">$(</span><span class="nb">sed</span> <span class="nt">-n</span> <span class="s1">'s/.*作    者： \(.*\).*/\1/p'</span> <span class="nv">$file</span><span class="si">)</span>
+    <span class="nb">echo</span> <span class="s2">"creator_name="</span><span class="nv">$creator_name</span><span class="s2">" in file="</span><span class="nv">$file</span>
+    
+    <span class="k">if</span> <span class="o">[</span> <span class="nt">-z</span> <span class="s2">"</span><span class="nv">$creator_name</span><span class="s2">"</span> <span class="o">]</span><span class="p">;</span> <span class="k">then
+        </span><span class="nb">echo</span> <span class="s1">'///获取创建者 第二种模板获取 为空 使用默认值'</span>
+        <span class="nv">creator_name</span><span class="o">=</span><span class="nv">$def_author_str</span>
+    <span class="k">fi</span>
+<span class="o">}</span>
+
+<span class="k">function </span>get_creator_name<span class="o">()</span> <span class="o">{</span>
+    <span class="nv">file</span><span class="o">=</span><span class="nv">$1</span>
+    <span class="nv">creator_name</span><span class="o">=</span><span class="si">$(</span><span class="nb">sed</span> <span class="nt">-n</span> <span class="s1">'s/.*Created by \(.*\) on.*/\1/p'</span> <span class="nv">$file</span><span class="si">)</span>
+    
+    <span class="k">if</span> <span class="o">[</span> <span class="nt">-z</span> <span class="s2">"</span><span class="nv">$creator_name</span><span class="s2">"</span> <span class="o">]</span><span class="p">;</span> <span class="k">then
+        </span>get_creator_name_with_template_2 <span class="nv">$file</span>
+    <span class="k">fi
+    
+    </span><span class="nb">echo</span> <span class="s2">"--------creator_name=【"</span><span class="nv">$creator_name</span><span class="s2">"】 in file="</span><span class="nv">$file</span>
+<span class="o">}</span>
+
+
+
+<span class="k">function </span>get_creator_time_with_template_2<span class="o">()</span> <span class="o">{</span>
+    <span class="nv">file</span><span class="o">=</span><span class="nv">$1</span>
+    <span class="nv">creator_time</span><span class="o">=</span><span class="si">$(</span><span class="nb">sed</span> <span class="nt">-n</span> <span class="s1">'s/.*创建日期： \(.*\).*/\1/p'</span> <span class="nv">$file</span><span class="si">)</span>
+    <span class="nb">echo</span> <span class="s2">"-------创建日期=【"</span><span class="nv">$creator_time</span><span class="s2">"】 in file="</span><span class="nv">$file</span>
+
+    <span class="k">if</span> <span class="o">[</span> <span class="nt">-z</span> <span class="s2">"</span><span class="nv">$creator_time</span><span class="s2">"</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+<span class="c">#        echo '///获取创建时间 第二种模板获取 为空 使用默认值'</span>
+        <span class="nv">creator_time</span><span class="o">=</span><span class="nv">$def_time_str</span>
+    <span class="k">fi</span>
+<span class="o">}</span>
+
+
+<span class="k">function </span>format_creator_time<span class="o">()</span> <span class="o">{</span>
+    <span class="nv">creator_time</span><span class="o">=</span><span class="nv">$1</span>
+    
+    <span class="nv">length</span><span class="o">=</span><span class="k">${#</span><span class="nv">creator_time</span><span class="k">}</span>
+
+    <span class="c"># 截取除最后一个字符外的部分</span>
+    <span class="nv">creator_time</span><span class="o">=</span><span class="k">${</span><span class="nv">creator_time</span>:0:length-1<span class="k">}</span>
+    <span class="c">#echo "截去掉最后一个字符后的字符串: $creator_time"</span>
+<span class="o">}</span>
+
+
+<span class="k">function </span>get_creator_time<span class="o">()</span> <span class="o">{</span>
+    <span class="nv">file</span><span class="o">=</span><span class="nv">$1</span>
+    
+    <span class="k">if</span> <span class="o">[</span> <span class="nt">-z</span> <span class="s2">"</span><span class="nv">$2</span><span class="s2">"</span> <span class="o">]</span><span class="p">;</span> <span class="k">then
+        </span><span class="nv">line</span><span class="o">=</span>5
+    <span class="k">else
+        </span><span class="nv">line</span><span class="o">=</span><span class="nv">$2</span>
+    <span class="k">fi</span>
+    <span class="c">#creator_time=$(sed -n '5s/.*\(.\{10\}\)$/\1/p' $file)</span>
+    <span class="nv">creator_time</span><span class="o">=</span><span class="si">$(</span><span class="nb">awk</span> <span class="s1">'NR=='</span><span class="nv">$line</span><span class="s1">' {print $NF}'</span> <span class="nv">$file</span><span class="si">)</span>
+
+    <span class="nb">echo</span> <span class="s2">"-------creator_time=【"</span><span class="nv">$creator_time</span><span class="s2">"】 line = "</span><span class="nv">$line</span><span class="s2">" in file="</span><span class="nv">$file</span>
+<span class="c">#    date_regex='^(19|20)[0-9]{2}/(0?[1-9]|1[0-2])/(0?[1-9]|[1-2][0-9]|3[0-1]).$'</span>
+    <span class="c">#date_regex='^(19[0-9]{2}|20[0-9]{2}|[0-9]{2})/(0?[1-9]|1[0-2])/(0?[1-9]|[1-2][0-9]|3[0-1]).$'</span>
+    <span class="nv">date_regex</span><span class="o">=</span><span class="s1">'^(19[0-9]{2}|20[0-9]{2}|[0-9]{2})([-/])(0?[1-9]|1[0-2])([-/])(0?[1-9]|[1-2][0-9]|3[0-1]).$'</span>
+
+    <span class="c"># 进行正则匹配</span>
+    <span class="k">if</span> <span class="o">[[</span> <span class="nv">$creator_time</span> <span class="o">=</span>~ <span class="nv">$date_regex</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then
+        </span><span class="nb">echo</span> <span class="s2">"日期格式正确，截断最后一个小数 ."</span>
+        format_creator_time <span class="nv">$creator_time</span>
+    <span class="k">else
+        if</span> <span class="o">[</span> <span class="nt">-z</span> <span class="s2">"</span><span class="nv">$2</span><span class="s2">"</span> <span class="o">]</span><span class="p">;</span> <span class="k">then
+            </span><span class="nv">discount</span><span class="o">=</span>1
+            <span class="nv">new_line</span><span class="o">=</span><span class="k">$((</span>line-discount<span class="k">))</span>
+            <span class="nb">echo</span> <span class="s2">"常规调用如果匹配不到的花，那么多一次，向上查找"</span><span class="nv">$discount</span><span class="s2">"行，进行递归:"</span><span class="nv">$new_line</span>
+            get_creator_time <span class="nv">$file</span> <span class="nv">$new_line</span>
+        <span class="k">else
+            </span><span class="nb">echo</span> <span class="s2">"日期格式错误，执行第二种匹配"</span>
+            get_creator_time_with_template_2 <span class="nv">$file</span>
+        <span class="k">fi
+    fi
+    </span><span class="nb">echo</span> <span class="s2">"********creator_time=【"</span><span class="nv">$creator_time</span><span class="s2">"】 in file="</span><span class="nv">$file</span>
+<span class="o">}</span>
+
+
+
+<span class="k">function </span>replace_header_anoation<span class="o">()</span> <span class="o">{</span>
+    <span class="nv">file</span><span class="o">=</span><span class="nv">$1</span>
+    
+    <span class="c">#定义要替换的字符串</span>
+    <span class="c">#文件名</span>
+    <span class="nv">filename</span><span class="o">=</span><span class="si">$(</span><span class="nb">echo</span> <span class="s2">"</span><span class="nv">$file</span><span class="s2">"</span> | <span class="nb">sed</span> <span class="s1">'s#.*/##'</span><span class="si">)</span>
+    <span class="c">#项目名</span>
+    <span class="nv">project_name</span><span class="o">=</span><span class="s2">"PSCProject"</span>
+    
+    <span class="c">#还有从当前类中获取作者信息，获取不到取默认值</span>
+    <span class="nv">auth</span><span class="o">=</span><span class="nv">$creator_name</span>
+    
+    <span class="c">#还有从当前类中获取作者信息，获取不到取默认值</span>
+    <span class="nb">date</span><span class="o">=</span><span class="nv">$creator_time</span>
+
+    <span class="c">#以下是替换的模板</span>
+    <span class="nv">new_content</span><span class="o">=</span><span class="s2">"//
+//  "</span><span class="nv">$filename</span><span class="s2">"
+//  "</span><span class="nv">$project_name</span><span class="s2">"
+//
+//  Created by "</span><span class="nv">$auth</span><span class="s2">" on "</span><span class="nv">$date</span><span class="s2">".
+//  "</span><span class="nv">$copyright_str</span><span class="s2">"
+//"</span>
+
+    <span class="nv">new_content_escaped</span><span class="o">=</span><span class="si">$(</span><span class="nb">echo</span> <span class="s2">"</span><span class="nv">$new_content</span><span class="s2">"</span> | <span class="nb">sed</span> <span class="s1">'s/$/\\/'</span><span class="si">)</span> <span class="c"># 转义换行符</span>
+    <span class="nb">sed</span> <span class="nt">-i</span> <span class="s1">''</span> <span class="nt">-e</span> <span class="s2">"1,7c</span><span class="se">\\</span><span class="s2">
+</span><span class="nv">$new_content_escaped</span><span class="s2">"</span> <span class="s2">"</span><span class="nv">$file</span><span class="s2">"</span>
+
+    <span class="c">#还有几个问题待优化</span>
+    <span class="c">#1、如果开头没有注释，则会直接覆盖，或者注释不足7行的</span>
+    <span class="c">#2、日期正则如果不是以 YYYY/MM/DD or YY/MM/DD 其中/和-都适用</span>
+        <span class="c">#2.1但是兼容2023/8/1这样的个位数日期)，</span>
+        <span class="c">#2.2如果日期是8/1/23 这样会导致识别错误 会被替换成今天的日期</span>
+
+<span class="o">}</span>
+
+<span class="c"># 统一类头注释</span>
+<span class="k">function </span>unify_header_anoation<span class="o">()</span> <span class="o">{</span>
+    <span class="nv">file</span><span class="o">=</span><span class="nv">$1</span>
+
+    <span class="c">#还有从当前类中获取作者信息，获取不到取默认值</span>
+    get_creator_name <span class="nv">$file</span>
+    
+    <span class="c">#还有从当前类中获取作者信息，获取不到取默认值</span>
+    get_creator_time <span class="nv">$file</span>
+    
+    <span class="c">#不传第二个参数 则执行替换，传就不执行</span>
+    <span class="k">if</span> <span class="o">[</span> <span class="nt">-z</span> <span class="s2">"</span><span class="nv">$2</span><span class="s2">"</span> <span class="o">]</span><span class="p">;</span> <span class="k">then
+        </span>replace_header_anoation <span class="nv">$file</span>
+    <span class="k">fi</span>
+<span class="o">}</span>
+
+
+<span class="k">function </span>main<span class="o">()</span> <span class="o">{</span>
+    <span class="nv">file_path</span><span class="o">=</span><span class="nv">$1</span>
+
+    <span class="k">if</span> <span class="o">[</span> <span class="nt">-z</span> <span class="s2">"</span><span class="nv">$file_path</span><span class="s2">"</span> <span class="o">]</span><span class="p">;</span> <span class="k">then
+        </span><span class="nb">echo</span> <span class="s1">'///未指定路径,file_path为. 当前路径'</span>
+        <span class="nv">file_path</span><span class="o">=</span><span class="nb">.</span>
+    <span class="k">fi</span>
+
+
+    <span class="c">#遍历当前路径下所有oc类</span>
+    find <span class="nv">$file_path</span> <span class="nt">-type</span> f <span class="nt">-name</span> <span class="s2">"*.swift"</span> <span class="nt">-o</span> <span class="nt">-name</span> <span class="s2">"*.h"</span> <span class="nt">-o</span> <span class="nt">-name</span> <span class="s2">"*.m"</span> | <span class="k">while </span><span class="nb">read </span>file<span class="p">;</span> <span class="k">do
+        </span>unify_header_anoation <span class="nv">$file</span> <span class="nv">$2</span>
+    <span class="k">done</span>
+<span class="o">}</span>
+
+
+main <span class="nv">$1</span> <span class="nv">$2</span>
+
+
+
+
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<h3 id="32-第二步新增类注释模板制定">3.2 第二步：新增类注释模板制定</h3>
+
+<p>增量治理，可以通过工程内部的内置的模板进行限定，具体操作为：</p>
+
+<h4 id="321-全局指定">3.2.1 全局指定</h4>
+
+<p>全局指定在下列路径中新增文件名为：IDETemplateMacros.plist</p>
+
+<p>其中内容为</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+</pre></td><td class="rouge-code"><pre><span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="cp">&lt;!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"&gt;</span>
+<span class="nt">&lt;plist</span> <span class="na">version=</span><span class="s">"1.0"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;dict&gt;</span>
+    <span class="nt">&lt;key&gt;</span>FILEHEADER<span class="nt">&lt;/key&gt;</span>
+    <span class="nt">&lt;string&gt;</span>
+//  
+//  ___FILENAME___ 
+//  ___PACKAGENAME___
+//
+//  Created by ___FULLUSERNAME___ on ___DATE___
+//  ___COPYRIGHT___
+//
+    <span class="nt">&lt;/string&gt;</span>
+<span class="nt">&lt;/dict&gt;</span>
+<span class="nt">&lt;/plist&gt;</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>路径（按优先级从低到高排序：如果更高一级优先级目录下出现了IDETemplateMacros，会覆盖比他低优先级的目录下的IDETemplateMacros内容）</p>
+
+<p>xcWorkspace：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>XXX.xcworkspace/xcshareddata/IDETemplateMacros.plist 
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>xcodeproj（相比xcworkspace，具有更高优先级）：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>XXX.xcodeproj/xcshareddata/IDETemplateMacros.plist
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>xcodeproj下的xcshareddata文件夹下存在IDETemplateMacros.plist，会覆盖xcworkspace的xcshareddata，（也就是xcworkspace的xcshareddata的IDETemplateMacros.plist不生效）</p>
+
+<p><u>**综上所述：xcworkspace下的IDETemplateMacros，在xcworkspace内部的xcodeproj未指定IDETemplateMacros时生效**</u></p>
+
+<h4 id="322-用户指定">3.2.2 用户指定</h4>
+
+<p>上述xcodeproj、xcworkspace根目录下还有各自xcuserdata，xcuserdata内包含各个用户名的文件夹 username.xcuserdatad，存在此目录下的IDETemplateMacros.plist ，优先级高于xcshareddata，</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>XXX.xcworkspace/xcuserdata/IDETemplateMacros.plist 
+XXX.xcodeproj/xcuserdata/IDETemplateMacros.plist
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p><strong><em><u>优先级与2.2.1所述一致：xcworkspace/xcodeproj内的xcshareddata下的IDETemplateMacros，在xcworkspace/xcodeproj内部的xcuserdata未指定IDETemplateMacros时生效</u></em></strong></p>
+
+<h4 id="323-本地指定">3.2.3 本地指定</h4>
+
+<p>上述情况之外：</p>
+
+<p><strong><em><u>在上述均不存在IDETemplateMacros.plist时，本地目录才会生效</u></em></strong>：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>/Users/Mac登录名/Library/Developer/Xcode/UserData/IDETemplateMacros.plist 
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+
+
+                <hr style="visibility: hidden;">
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2023/07/26/5-iOS%E7%BB%84%E4%BB%B6%E5%8C%96-%E8%B5%84%E6%BA%90%E7%BB%84%E4%BB%B6%E5%BA%93/" data-toggle="tooltip" data-placement="top" title="iOS组件化实践之：资源组件库">
+                        Previous<br>
+                        <span>iOS组件化实践之：资源组件库</span>
+                        </a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="/2023/08/02/iOS-%E7%BB%84%E4%BB%B6%E5%8C%96%E5%AE%9E%E8%B7%B5%E4%B9%8B-%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98%E5%8F%8A%E8%A7%A3%E5%86%B3%E8%BF%87%E7%A8%8B%E7%BA%AA%E8%A6%81-%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0%E4%B8%AD/" data-toggle="tooltip" data-placement="top" title="iOS组件化实践之：遇到的问题及解决过程纪要(持续更新中)">
+                        Next<br>
+                        <span>iOS组件化实践之：遇到的问题及解决过程纪要(持续更新中)</span>
+                        </a>
+                    </li>
+                    
+                </ul>
+                <hr style="visibility: hidden;">
+
+                
+                <!-- disqus 评论框 start -->
+                <div class="comment">
+                    <div id="disqus_thread" class="disqus-thread"></div>
+                </div>
+                <!-- disqus 评论框 end -->
+                
+
+                
+            </div>  
+
+    <!-- Side Catalog Container -->
+        
+            <div class="
+                col-lg-2 col-lg-offset-0
+                visible-lg-block
+                sidebar-container
+                catalog-container">
+                <div class="side-catalog">
+                    <hr class="hidden-sm hidden-xs">
+                    <h5>
+                        <a class="catalog-toggle" href="#">CATALOG</a>
+                    </h5>
+                    <ul class="catalog-body"></ul>
+                </div>
+            </div>
+        
+
+    <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+
+
+<section>
+    
+        <hr class="hidden-sm hidden-xs">
+    
+    <h5><a href="/archive/">FEATURED TAGS</a></h5>
+    <div class="tags">
+        
+        
+        
+        
+        
+    </div>
+</section>
+
+
+                <!-- Friends Blog -->
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+<!-- add support for mathjax by voleking-->
+
+
+
+
+
+
+<!-- disqus 公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = "Cyp";
+    var disqus_identifier = "/2023/07/31/6-iOS-组件化-命名注释篇";
+    var disqus_url = "http://localhost:4000/2023/07/31/6-iOS-%E7%BB%84%E4%BB%B6%E5%8C%96-%E5%91%BD%E5%90%8D%E6%B3%A8%E9%87%8A%E7%AF%87/";
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<!-- disqus 公共JS代码 end -->
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'right',
+          // icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <!-- SNS Link -->
+                
+
+
+<ul class="list-inline text-center">
+
+
+  
+  
+  
+  
+  
+  
+  
+</ul>
+
+                <p class="copyright text-muted">
+                    Copyright &copy; PaysonChen Blog 2023
+                    <br>
+                    <!-- Powered by <a href="http://huangxuan.me">Hux Blog</a> | -->
+                 <!--    <iframe style="margin-left: 2px; margin-bottom:-5px;" frameborder="0" scrolling="0" width="100px"
+                        height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=huxpro&repo=huxpro.github.io&type=star&count=true">
+                    </iframe> -->
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<!-- Currently, only navbar scroll-down effect at desktop still depends on this -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js "></script>
+
+<!-- Simple Jekyll Search -->
+<script src="/js/simple-jekyll-search.min.js"></script>
+
+<!-- Service Worker -->
+
+<script src="/js/snackbar.js "></script>
+<script src="/js/sw-registration.js "></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+        var d = document, t = 'script',
+            o = d.createElement(t),
+            s = d.getElementsByTagName(t)[0];
+        o.src = u;
+        if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+        s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!--
+     Because of the native support for backtick-style fenced code blocks
+     right within the Markdown is landed in Github Pages,
+     From V1.6, There is no need for Highlight.js,
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/
+     - https://github.com/jneen/rouge/wiki/list-of-supported-languages-and-lexers
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+
+
+
+
+
+<!--fastClick.js -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js", function () {
+        var $nav = document.querySelector("nav");
+        if ($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+<!-- Side Catalog -->
+
+<script type="text/javascript">
+    function generateCatalog(selector) {
+
+        // interop with multilangual 
+        if ('' == 'true') {
+            _containerSelector = 'div.post-container.active'
+        } else {
+            _containerSelector = 'div.post-container'
+        }
+
+        // init
+        var P = $(_containerSelector), a, n, t, l, i, c;
+        a = P.find('h1,h2,h3,h4,h5,h6');
+
+        // clean
+        $(selector).html('')
+
+        // appending
+        a.each(function () {
+            n = $(this).prop('tagName').toLowerCase();
+            i = "#" + $(this).prop('id');
+            t = $(this).text();
+            c = $('<a href="' + i + '" rel="nofollow">' + t + '</a>');
+            l = $('<li class="' + n + '_nav"></li>').append(c);
+            $(selector).append(l);
+        });
+        return true;
+    }
+
+    generateCatalog(".catalog-body");
+
+    // toggle side catalog
+    $(".catalog-toggle").click((function (e) {
+        e.preventDefault();
+        $('.side-catalog').toggleClass("fold")
+    }))
+
+    /*
+     * Doc: https://github.com/davist11/jQuery-One-Page-Nav
+     * Fork by Hux to support padding
+     */
+    async("/js/jquery.nav.js", function () {
+        $('.catalog-body').onePageNav({
+            currentClass: "active",
+            changeHash: !1,
+            easing: "swing",
+            filter: "",
+            scrollSpeed: 700,
+            scrollOffset: 0,
+            scrollThreshold: .2,
+            begin: null,
+            end: null,
+            scrollChange: null,
+            padding: 80
+        });
+    });
+</script>
+
+
+
+<!-- Multi-Lingual -->
+
+
+<!-- Simple Jekyll Search -->
+<script>
+    // https://stackoverflow.com/questions/1912501/unescape-html-entities-in-javascript
+    function htmlDecode(input) {
+        var e = document.createElement('textarea');
+        e.innerHTML = input;
+        // handle case of empty input
+        return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
+    }
+
+    SimpleJekyllSearch({
+        searchInput: document.getElementById('search-input'),
+        resultsContainer: document.getElementById('search-results'),
+        json: '/search.json',
+        searchResultTemplate: '<div class="post-preview item"><a href="{url}"><h2 class="post-title">{title}</h2><h3 class="post-subtitle">{subtitle}</h3><hr></a></div>',
+        noResultsText: 'No results',
+        limit: 50,
+        fuzzy: false,
+        // a hack to get escaped subtitle unescaped. for some reason, 
+        // post.subtitle w/o escape filter nuke entire search.
+        templateMiddleware: function (prop, value, template) {
+            if (prop === 'subtitle' || prop === 'title') {
+                if (value.indexOf("code")) {
+                    return htmlDecode(value);
+                } else {
+                    return value;
+                }
+            }
+        }
+    });
+
+    $(document).ready(function () {
+        var $searchPage = $('.search-page');
+        var $searchOpen = $('.search-icon');
+        var $searchClose = $('.search-icon-close');
+        var $searchInput = $('#search-input');
+        var $body = $('body');
+
+        $searchOpen.on('click', function (e) {
+            e.preventDefault();
+            $searchPage.toggleClass('search-active');
+            var prevClasses = $body.attr('class') || '';
+            setTimeout(function () {
+                $body.addClass('no-scroll');
+            }, 400)
+
+            if ($searchPage.hasClass('search-active')) {
+                $searchClose.on('click', function (e) {
+                    e.preventDefault();
+                    $searchPage.removeClass('search-active');
+                    $body.attr('class', prevClasses);  // from closure 
+                });
+                $searchInput.focus();
+            }
+        });
+    });
+</script>
+
+
+<!-- Image to hack wechat -->
+<img src="/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>
