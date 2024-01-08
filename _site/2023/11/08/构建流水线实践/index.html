@@ -1,0 +1,1951 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="description" content="与你一起发现更大的世界。">
+    <meta name="keywords"  content="PaysonChen,iOS,流媒体">
+    <meta name="theme-color" content="#000000">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="构建流水线实践 - PaysonChen的博客 | PaysonChen Blog">
+    
+    <meta property="og:type" content="article">
+    <meta property="og:description" content="1 背景
+">
+    
+    <script type="text/javascript"
+  src="https://unpkg.com/mermaid@8.0.0-rc.8/dist/mermaid.min.js">
+</script>
+<script>
+$(document).ready(function() {
+    mermaid.initialize({
+        theme: 'forest'
+    });
+});
+</script>
+    
+    
+    <meta property="article:published_time" content="2023-11-08T00:00:00Z">
+    
+    
+    <meta property="article:author" content="PaysonChen">
+    
+    
+    
+    <meta property="og:image" content="http://localhost:4000">
+    <meta property="og:url" content="http://localhost:4000/2023/11/08/%E6%9E%84%E5%BB%BA%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%AE%9E%E8%B7%B5/">
+    <meta property="og:site_name" content="PaysonChen的博客 | PaysonChen Blog">
+    
+    <title>构建流水线实践 - PaysonChen的博客 | PaysonChen Blog</title>
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/pwa/manifest.json">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/img/favicon.ico">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="http://localhost:4000/2023/11/08/%E6%9E%84%E5%BB%BA%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%AE%9E%E8%B7%B5/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">PaysonChen Blog</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div id="huxblog_navbar">
+                <div class="navbar-collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="/">Home</a>
+                        </li>
+                        
+                        
+                        
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                        
+                        
+                        <li>
+                            <a href="/archive/">Archive</a>
+                        </li>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        <li class="search-icon">
+                            <a href="javascript:void(0)">
+                                <i class="fa fa-search"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <script>
+        // Drop Bootstarp low-performance Navbar
+        // Use customize navbar with high-quality material design animation
+        // in high-perf jank-free CSS3 implementation
+        var $body = document.body;
+        var $toggle = document.querySelector('.navbar-toggle');
+        var $navbar = document.querySelector('#huxblog_navbar');
+        var $collapse = document.querySelector('.navbar-collapse');
+
+        var __HuxNav__ = {
+            close: function () {
+                $navbar.className = " ";
+                // wait until animation end.
+                setTimeout(function () {
+                    // prevent frequently toggle
+                    if ($navbar.className.indexOf('in') < 0) {
+                        $collapse.style.height = "0px"
+                    }
+                }, 400)
+            },
+            open: function () {
+                $collapse.style.height = "auto"
+                $navbar.className += " in";
+            }
+        }
+
+        // Bind Event
+        $toggle.addEventListener('click', function (e) {
+            if ($navbar.className.indexOf('in') > 0) {
+                __HuxNav__.close()
+            } else {
+                __HuxNav__.open()
+            }
+        })
+
+        /**
+         * Since Fastclick is used to delegate 'touchstart' globally
+         * to hack 300ms delay in iOS by performing a fake 'click',
+         * Using 'e.stopPropagation' to stop 'touchstart' event from 
+         * $toggle/$collapse will break global delegation.
+         * 
+         * Instead, we use a 'e.target' filter to prevent handler
+         * added to document close HuxNav.  
+         *
+         * Also, we use 'click' instead of 'touchstart' as compromise
+         */
+        document.addEventListener('click', function (e) {
+            if (e.target == $toggle) return;
+            if (e.target.className == 'icon-bar') return;
+            __HuxNav__.close();
+        })
+    </script>
+    <!-- Search -->
+<div class="search-page">
+  <div class="search-icon-close-container">
+    <span class="search-icon-close">
+      <i class="fa fa-chevron-down"></i>
+    </span>
+  </div>
+  <div class="search-main container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <form></form>
+        <input type="text" id="search-input" placeholder="$ grep...">
+        </form>
+        <div id="search-results" class="mini-post-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <!-- Image to hack wechat -->
+<!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="/img/home-bg-geek.jpg" width="0" height="0"> -->
+
+<!-- Post Header -->
+
+
+
+<style type="text/css">
+    header.intro-header{
+        position: relative;
+        background-image: url('/img/home-bg-geek.jpg');
+        background: ;
+    }
+
+    
+</style>
+
+<header class="intro-header" >
+
+    <div class="header-mask"></div>
+    
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                    </div>
+                    <h1>构建流水线实践</h1>
+                    
+                    <h2 class="subheading"></h2>
+                    <span class="meta">Posted by PaysonChen on November 8, 2023</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <!-- Multi-Lingual -->
+                
+
+				<h2 id="1-背景">1 背景</h2>
+
+<p>​	为了适应不通项目的自动化的需求，而且构建的方式和能力也在不断的迭代与演进，同时维护多个构建脚本存在成本与遗漏，因此将打包脚本的通用能力抽离，通过配置参数进行不同项目的构建。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+</pre></td><td class="rouge-code"><pre># [目的]
+# 为了使流水线建设趋于可维护，易维护，可迁移，易迁移，对构建逻辑进行模块化、将构建主流程划分为：构建前、构建、构建后，三大模块
+#
+#   构建前：参数配置、版本号设置
+#   构建中：Pod install、xcbuild
+#   构建后：归档、分发、通知
+#
+# 当前的构建后方案的选择：
+#   归档：简单云（ipa+dSYM）、bugly（dSYM）
+#   分发：蒲公英、阿里云OSS、AppStore
+#   通知：钉钉机器人
+# 在未来的持续集成过程中，可以对归档方案进行替换、对分发方案进行替换、对通知方案进行替换、不需要阅读和改动构建中流程
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<h2 id="2-开始">2 开始</h2>
+
+<p>构建脚本由构建入口、构建主流程、额外流程三个模块构成，</p>
+
+<script src="js/mermaid.ts"></script>
+<div class="mermaid">
+
+graph TB
+START--&gt;入参配置
+入参配置--&gt;构建前-第三方APIKEY配置
+构建前-第三方APIKEY配置--&gt;构建前-设置构建版本号自增
+构建前-设置构建版本号自增--&gt;构建前-获取工程配置  
+构建前-获取工程配置--&gt;构建中-环境变量设置
+构建中-环境变量设置--&gt;构建中-执行Pod依赖安装
+构建中-执行Pod依赖安装--&gt;构建中-执行构建
+构建中-执行构建--&gt;构建中-执行归档
+构建中-执行归档--&gt;构建中-执行分发
+构建中-执行分发--&gt;构建中-执行通知
+构建中-执行通知--&gt;END
+
+</div>
+
+<h3 id="21-构建入口">2.1 构建入口</h3>
+
+<p>构建入口由UniversalBuild.sh 执行，负责可变参数声明及脚本入参处理</p>
+
+<p>参数说明：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre></td><td class="rouge-code"><pre># [参数]
+#   -cfg                #打包方式：configuration(0:DailyBuild|1:TestFlight|2:Release|3:TFInner)
+#   -target_name        #项目配置：要打包的TargetName
+#   -channel_name       #渠道号：pgy下载 url后缀
+#   -notify             #是否启用通知 有传值1则启用群通知，2启用内部群通知
+#   -publish            #分发方式：1 启用oss| 2 启用pgy+oss | else pgy
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>以下以【Demo】为例：</p>
+
+<p>​	Target为PSCDemoiOS</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+</pre></td><td class="rouge-code"><pre># [调用说明]
+#   使用了gitsubmodule 构建组件，兼容git 检出不兼容，需要先执行 git submodule update --init --recursive
+#   git submodule update --init --recursive
+#   拉取自模块更新
+#   git submodule update --remote
+#
+#   打包方式：configuration(0:DailyBuild|1:TestFlight|2:Release|3:TFInner)
+#   configuration=0
+#
+#   项目配置（TargetName与源码所在目录需同名）：
+#   targetName=PSCDemoiOS
+#
+#   渠道号：pgy下载 url后缀
+#   pgyChannel=129
+#
+#   是否启用通知 有传值1则启用群通知，2启用内部群通知
+#   notify=1
+#
+#   1 启用oss 2 启用pgy+oss else pgy
+#   publish=0
+#
+#   sh PSC_iOS_Build_SH/UniversalBuild.sh -cfg $configuration -target_name $targetName -channel_name $pgyChannel -notify $notify -publish $publish
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<h3 id="22-构建主流程">2.2 构建主流程</h3>
+
+<p>构建主流吃由build_sh.sh 执行，负责iOS构建工作，此部分与打包业务强相关，相对比较稳定，不太需要频繁修改，因此抽离出来</p>
+
+<p>主流程简单说明：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+</pre></td><td class="rouge-code"><pre><span class="k">function </span>build<span class="o">()</span>
+<span class="o">{</span>
+    <span class="c">#新增耗时统计</span>
+    <span class="nb">export </span><span class="nv">build_start_time</span><span class="o">=</span><span class="si">$(</span><span class="nb">date</span> +%s.%N<span class="si">)</span>
+
+    <span class="c">#初始化环境</span>
+    bInitEnv
+    print_time_cost <span class="s2">"构建前配置"</span>
+
+    <span class="c">#执行pod</span>
+    bPodInstall
+    print_time_cost <span class="s2">"执行pod"</span>
+
+    <span class="c">#执行构建</span>
+    bBuildProject
+    print_time_cost <span class="s2">"执行构建"</span>
+
+    <span class="c">#执行构建后的归档流程：ipa &amp; dsym</span>
+    bCollection
+    print_time_cost <span class="s2">"执行构建归档操作"</span>
+
+    <span class="c">#执行构建后的分发流程：上传（发布）安装包，供下载安装</span>
+    bDistribution
+    print_time_cost <span class="s2">"执行分发操作"</span>
+
+    <span class="c">#执行构建后的通知流程</span>
+    bNotification
+    print_time_cost <span class="s2">"执行通知操作"</span>
+<span class="o">}</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>详细步骤，详见代码相关模块</p>
+
+<h3 id="23-额外流程">2.3 额外流程</h3>
+
+<p>额外流程抽离是考虑到上传、通知、归档等属于打包的后续操作，不需要与打包流程耦合，且这部分的流程抽离，可实现模块的热插拔替换。</p>
+
+<h4 id="231-分发">2.3.1 分发</h4>
+
+<p>​	目前支持以下三种分法方式：</p>
+
+<ul>
+  <li>蒲公英</li>
+  <li>阿里云OSS</li>
+  <li>AppStore</li>
+</ul>
+
+<p>​	安装包的分发逻辑调用</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>sh build_ext/build_publish.sh
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>​	在 build_publish.sh 中执行分发逻辑，</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+</pre></td><td class="rouge-code"><pre><span class="k">function </span>upload_ipa <span class="o">()</span>
+<span class="o">{</span>
+    <span class="nb">export </span><span class="nv">upload_start_time</span><span class="o">=</span><span class="si">$(</span><span class="nb">date</span> +%s.%N<span class="si">)</span>
+    <span class="nb">echo</span> <span class="s1">'///upload_ipa configurationName = '</span><span class="k">${</span><span class="nv">configurationName</span><span class="k">}</span>
+    <span class="k">if</span> <span class="o">[</span> <span class="s2">"</span><span class="k">${</span><span class="nv">packedToAppStore</span><span class="k">}</span><span class="s2">"</span> <span class="o">==</span> <span class="s2">"1"</span> <span class="o">]</span><span class="p">;</span> <span class="k">then
+        </span><span class="nb">echo</span> <span class="s1">'TFInner 、TestFlight &amp; appstore 上传到appstore 统计耗时'</span>
+        upload_ipa_to_AppStore
+        print_upload_time_cost <span class="s2">"上传AppStore"</span>
+
+    <span class="k">else</span>
+        <span class="c">#其他</span>
+        <span class="c">#启用pgy时构建包上传到pgy</span>
+        <span class="k">if</span> <span class="o">[</span> <span class="s2">"</span><span class="k">${</span><span class="nv">use_pgy_publish</span><span class="k">}</span><span class="s2">"</span> <span class="o">=</span> <span class="s2">"1"</span> <span class="o">]</span><span class="p">;</span> <span class="k">then
+            </span><span class="nb">echo</span> <span class="s1">'///启用pgy上传，统计耗时'</span>
+            upload_ipa_to_pgyer
+            print_upload_time_cost <span class="s2">"上传PGY"</span>
+        <span class="k">fi</span>
+
+        <span class="c">#启用oss</span>
+        <span class="k">if</span> <span class="o">[</span> <span class="s2">"</span><span class="k">${</span><span class="nv">use_oss_publish</span><span class="k">}</span><span class="s2">"</span> <span class="o">=</span> <span class="s2">"1"</span> <span class="o">]</span><span class="p">;</span> <span class="k">then
+            </span><span class="nb">echo</span> <span class="s1">'///启用oss上传，统计耗时'</span>
+            upload_ipa_to_aliyunOSS
+            print_upload_time_cost <span class="s2">"上传oss"</span>
+        <span class="k">fi
+    fi</span>
+<span class="o">}</span>
+
+
+<span class="k">function </span>upload<span class="o">()</span>
+<span class="o">{</span>   
+    <span class="c">#发布ipa</span>
+    upload_ipa
+<span class="o">}</span>
+
+<span class="c">#归档</span>
+upload
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>​	上传测试包可以从现在的蒲公英换到Fir或者简单云等，则不需要关心打包流程，只需要将上传模块的方法切换即可。</p>
+
+<ul>
+  <li><strong>dailybuild</strong></li>
+</ul>
+
+<p>​	蒲公英：</p>
+
+<p>​	用于测试包构建，安装包目前上传到蒲公英（服务端环境可切换）</p>
+
+<p>​	上传蒲公英的逻辑：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+</pre></td><td class="rouge-code"><pre><span class="c">#发布到第三方分发平台：蒲公英</span>
+<span class="k">function </span>upload_ipa_to_pgyer <span class="o">()</span>
+<span class="o">{</span>
+    <span class="nb">echo</span> <span class="s1">'/// 上传 PGY 开始 IPA_PATH='</span><span class="k">${</span><span class="nv">IPA_PATH</span><span class="k">}</span>
+    <span class="nb">echo</span> <span class="s1">'/// 上传 PGY 开始 渠道='</span><span class="k">${</span><span class="nv">channel_name</span><span class="k">}</span>
+    <span class="nb">echo</span> <span class="s1">'/// 上传 PGY 开始 提交 git_log='</span><span class="k">${</span><span class="nv">git_log</span><span class="k">}</span>
+        
+    <span class="nv">compileEnvironment</span><span class="o">=</span><span class="s2">"</span><span class="k">${</span><span class="nv">buildName</span><span class="k">}</span><span class="s2">:</span><span class="k">${</span><span class="nv">git_log</span><span class="k">}</span><span class="s2">"</span>
+    <span class="nb">echo</span> <span class="s1">'/// 上传 PGY 开始 内容='</span><span class="k">${</span><span class="nv">compileEnvironment</span><span class="k">}</span>
+
+    <span class="k">if</span> <span class="o">[</span> <span class="nt">-z</span> <span class="s2">"</span><span class="nv">$channel_name</span><span class="s2">"</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+        <span class="c"># 渠道空，则走默认 不指定渠道号的上传</span>
+        <span class="c"># 改成2.0api</span>
+        <span class="nb">echo</span> <span class="s1">'/// 上传 PGY 开始 渠道 为空'</span>
+        bash <span class="nv">$build_ext_path</span>/publish_res/pgyer_upload.sh <span class="nt">-k</span> <span class="k">${</span><span class="nv">pgyAPIKey</span><span class="k">}</span> <span class="nt">-d</span> <span class="k">${</span><span class="nv">compileEnvironment</span><span class="k">}</span> <span class="k">${</span><span class="nv">IPA_PATH</span><span class="k">}</span>
+    <span class="k">else</span>
+        <span class="c"># 渠道非空，走下载地址关联 渠道</span>
+        <span class="c"># 改成2.0api</span>
+        <span class="nb">echo</span> <span class="s1">'/// 上传 PGY 开始 渠道='</span><span class="k">${</span><span class="nv">channel_name</span><span class="k">}</span>
+        bash <span class="nv">$build_ext_path</span>/publish_res/pgyer_upload.sh <span class="nt">-k</span> <span class="k">${</span><span class="nv">pgyAPIKey</span><span class="k">}</span> <span class="nt">-d</span> <span class="k">${</span><span class="nv">compileEnvironment</span><span class="k">}</span> <span class="nt">-c</span> <span class="k">${</span><span class="nv">pgyDownloadUrlSubfix</span><span class="k">}</span> <span class="k">${</span><span class="nv">IPA_PATH</span><span class="k">}</span>
+    <span class="k">fi
+            
+    </span><span class="nb">echo</span> <span class="s1">'/// 上传 PGY 结束'</span>
+<span class="o">}</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>​	阿里云OSS：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+</pre></td><td class="rouge-code"><pre><span class="c">#在下载二维码增加git日志</span>
+<span class="k">function </span>add_log_commit_title_msg_to_qrcode <span class="o">()</span>
+<span class="o">{</span>
+    <span class="c">#二维码打上版本信息</span>
+    <span class="c">#TODO: 这里需要安装下工具 ImageMgick [brew install ImageMgick]</span>
+    <span class="c">#check_command_and_install "convert" "ImageMgick"</span>
+    bash <span class="nv">$build_ext_path</span>/build_tools/build_tools.sh <span class="s2">"convert"</span> <span class="s2">"ImageMagick"</span>
+    
+    <span class="nv">title</span><span class="o">=</span><span class="nv">$xcodeVersion3number</span>.<span class="k">${</span><span class="nv">channel_name</span><span class="k">}</span>.<span class="nv">$configurationName</span>.<span class="k">${</span><span class="nv">BuildNo</span><span class="k">}</span>
+
+    <span class="k">if</span> <span class="o">[</span> <span class="nv">$1</span> <span class="o">=</span> <span class="s2">"1"</span> <span class="o">]</span><span class="p">;</span> <span class="k">then
+        </span><span class="nv">dst_line_cnt</span><span class="o">=</span>0
+        <span class="c">#FIXME: 这样取会为空???? ${source_log_arr}</span>
+        <span class="nb">export </span><span class="nv">oss_source_log_arr</span><span class="o">=(</span><span class="sb">`</span><span class="nb">echo</span> <span class="nv">$source_log_str</span> | <span class="nb">tr</span> <span class="s1">'}{'</span> <span class="s1">' '</span><span class="sb">`</span><span class="o">)</span>
+        <span class="nb">export </span><span class="nv">oss_log_line_count</span><span class="o">=</span><span class="k">${#</span><span class="nv">oss_source_log_arr</span><span class="p">[@]</span><span class="k">}</span>
+        <span class="nb">echo</span> <span class="s1">'/// oss 分发： 添加 二维码msg log_line_count='</span><span class="nv">$oss_log_line_count</span>
+        <span class="nb">echo</span> <span class="s1">'/// oss 分发： 添加 二维码msg source_log_arr count='</span><span class="k">${#</span><span class="nv">source_log_arr</span><span class="p">[@]</span><span class="k">}</span>
+
+        <span class="k">for</span><span class="o">((</span> <span class="nv">i</span><span class="o">=</span>0<span class="p">;</span>i&lt;<span class="k">${</span><span class="nv">oss_log_line_count</span><span class="k">}</span><span class="p">;</span>i++<span class="o">))</span>
+        <span class="k">do
+            </span><span class="nv">single_len</span><span class="o">=</span><span class="si">$(</span><span class="nb">echo</span> <span class="nt">-n</span> <span class="s2">"</span><span class="k">${</span><span class="nv">oss_source_log_arr</span><span class="p">[i]</span><span class="k">}</span><span class="s2">"</span> | <span class="nb">wc</span> <span class="nt">-m</span><span class="si">)</span>
+            <span class="k">if</span> <span class="o">[</span> <span class="nt">-z</span> <span class="s2">"</span><span class="k">${</span><span class="nv">oss_source_log_arr</span><span class="p">[i]</span><span class="k">}</span><span class="s2">"</span> <span class="o">]</span><span class="p">;</span> <span class="k">then
+                </span><span class="nv">oss_singleStr</span><span class="o">=</span><span class="k">${</span><span class="nv">oss_source_log_arr</span><span class="p">[i]</span><span class="k">}</span><span class="p">;</span>
+                <span class="nb">echo</span> <span class="s1">'///--遍历'</span><span class="k">${</span><span class="nv">oss_source_log_arr</span><span class="p">[i]</span><span class="k">}</span><span class="s1">'为空文字长度：'</span><span class="nv">$single_len</span>
+                <span class="nv">dst_line_cnt</span><span class="o">=</span><span class="k">$((</span>dst_line_cnt+1<span class="k">))</span>
+            <span class="k">else
+                </span><span class="nv">line_max_len</span><span class="o">=</span>30
+                <span class="nv">ingle_cnt</span><span class="o">=</span><span class="k">$((</span>single_len <span class="o">/</span> line_max_len<span class="k">))</span>
+
+
+                <span class="k">if</span> <span class="o">((</span>ingle_cnt <span class="o">&gt;</span> 0<span class="o">))</span><span class="p">;</span> <span class="k">then
+                    for</span><span class="o">((</span> <span class="nv">j</span><span class="o">=</span>0<span class="p">;</span>j&lt;<span class="o">=</span><span class="k">${</span><span class="nv">ingle_cnt</span><span class="k">}</span><span class="p">;</span>j++<span class="o">))</span>
+                    <span class="k">do
+                        </span><span class="nv">string</span><span class="o">=</span><span class="k">${</span><span class="nv">oss_source_log_arr</span><span class="p">[i]</span><span class="k">}</span>
+                        <span class="nv">single_line1</span><span class="o">=</span><span class="k">${</span><span class="nv">string</span>:<span class="p">(line_max_len * j)</span>:line_max_len<span class="k">}</span>
+                        <span class="nb">echo</span> <span class="s1">'///--遍历'</span> <span class="k">${</span><span class="nv">oss_source_log_arr</span><span class="p">[i]</span><span class="k">}</span><span class="s1">'文字长度：'</span><span class="nv">$single_len</span><span class="s1">'超阈值阶段：第'</span><span class="nv">$j</span><span class="s1">'行:'</span><span class="nv">$single_line1</span>
+                        oss_singleStr+<span class="o">=</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="k">${</span><span class="nv">single_line1</span><span class="k">}</span><span class="p">;</span>
+                        <span class="nv">dst_line_cnt</span><span class="o">=</span><span class="k">$((</span>dst_line_cnt+1<span class="k">))</span>
+                    <span class="k">done</span><span class="p">;</span>
+                <span class="k">else
+                    </span><span class="nb">echo</span> <span class="s1">'///--遍历'</span> <span class="k">${</span><span class="nv">oss_source_log_arr</span><span class="p">[i]</span><span class="k">}</span><span class="s1">' 文字长度：'</span><span class="nv">$single_len</span>
+                    <span class="nv">dst_line_cnt</span><span class="o">=</span><span class="k">$((</span>dst_line_cnt+1<span class="k">))</span>
+                    oss_singleStr+<span class="o">=</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="k">${</span><span class="nv">oss_source_log_arr</span><span class="p">[i]</span><span class="k">}</span><span class="p">;</span>
+                <span class="k">fi
+            fi
+        done</span><span class="p">;</span>
+        <span class="nv">msg</span><span class="o">=</span><span class="nv">$oss_singleStr</span>
+        <span class="nb">echo</span> <span class="s2">"/// oss render msg="</span><span class="nv">$msg</span>
+        
+        <span class="nv">contentsize_width</span><span class="o">=</span>600
+        <span class="nv">contentsize_height</span><span class="o">=</span><span class="k">$((</span>contentsize_width <span class="o">+</span> <span class="nv">$dst_line_cnt</span> <span class="o">*</span> <span class="m">25</span> <span class="o">+</span> <span class="m">40</span> <span class="o">+</span> <span class="m">40</span><span class="k">))</span> <span class="c">#第一个40是title的高度 第二个40是距离底部空间</span>
+        <span class="nb">echo</span> <span class="s2">"contentsize_height="</span><span class="nv">$contentsize_height</span>
+        <span class="c">#改变原图大小</span>
+        convert <span class="nv">$qrcode_path</span> <span class="nt">-resize</span> <span class="k">${</span><span class="nv">contentsize_width</span><span class="k">}</span>x<span class="k">${</span><span class="nv">contentsize_width</span><span class="k">}</span>^ <span class="nt">-gravity</span> center <span class="k">${</span><span class="nv">qrcode_path</span><span class="k">}</span>_1.png
+        <span class="nb">echo</span> <span class="s2">"1 convert："</span><span class="k">${</span><span class="nv">contentsize_width</span><span class="k">}</span>x<span class="k">${</span><span class="nv">contentsize_width</span><span class="k">}</span>
+
+        <span class="c">#变高，兼容msg</span>
+        convert <span class="k">${</span><span class="nv">qrcode_path</span><span class="k">}</span>_1.png <span class="nt">-gravity</span> north <span class="nt">-extent</span> <span class="k">${</span><span class="nv">contentsize_width</span><span class="k">}</span>x<span class="k">${</span><span class="nv">contentsize_height</span><span class="k">}</span> <span class="k">${</span><span class="nv">qrcode_path</span><span class="k">}</span>_2.png
+        <span class="nb">echo</span> <span class="s2">"2 convert："</span><span class="k">${</span><span class="nv">contentsize_width</span><span class="k">}</span>x<span class="k">${</span><span class="nv">contentsize_height</span><span class="k">}</span>
+
+        <span class="c">#汉字字体</span>
+        <span class="nv">chn_tff_path</span><span class="o">=</span><span class="nv">$build_ext_path</span>/publish_res/chn.ttf
+        
+        <span class="c">#渲染title</span>
+        convert <span class="k">${</span><span class="nv">qrcode_path</span><span class="k">}</span>_2.png <span class="nt">-gravity</span> north <span class="nt">-pointsize</span> 30 <span class="nt">-font</span> <span class="nv">$chn_tff_path</span> <span class="nt">-fill</span> black <span class="nt">-annotate</span> +0+<span class="k">${</span><span class="nv">contentsize_width</span><span class="k">}</span> <span class="nv">$title</span> <span class="k">${</span><span class="nv">qrcode_path</span><span class="k">}</span>_3.png
+        <span class="nb">echo</span> <span class="s2">"3 convert：title："</span><span class="k">${</span><span class="nv">title</span><span class="k">}</span>
+
+        <span class="c">#渲染msg</span>
+        <span class="k">if</span> <span class="o">[</span> <span class="nt">-z</span> <span class="s2">"</span><span class="nv">$msg</span><span class="s2">"</span> <span class="o">]</span><span class="p">;</span> <span class="k">then
+            </span><span class="nb">echo</span> <span class="s2">"4 convert：msg：为空"</span>
+        <span class="k">fi
+        
+        </span>convert <span class="k">${</span><span class="nv">qrcode_path</span><span class="k">}</span>_3.png <span class="nt">-gravity</span> north <span class="nt">-pointsize</span> 20 <span class="nt">-font</span> <span class="nv">$chn_tff_path</span> <span class="nt">-fill</span> black <span class="nt">-annotate</span> +0+<span class="k">$((${</span><span class="nv">contentsize_width</span><span class="k">}</span><span class="o">+</span><span class="m">40</span><span class="k">))</span> <span class="nv">$msg</span> <span class="k">${</span><span class="nv">qrcode_path</span><span class="k">}</span>_4.png
+        <span class="nb">echo</span> <span class="s2">"4 convert：msg："</span><span class="k">${</span><span class="nv">msg</span><span class="k">}</span>
+        
+        <span class="k">if </span><span class="nb">test</span> <span class="nt">-e</span> <span class="s2">"</span><span class="k">${</span><span class="nv">qrcode_path</span><span class="k">}</span><span class="s2">_4.png"</span><span class="p">;</span> <span class="k">then
+            </span><span class="nb">echo</span> <span class="s2">"4 convert：msg 存在"</span>
+            <span class="nv">qrcode_path_with_msg</span><span class="o">=</span><span class="k">${</span><span class="nv">qrcode_path</span><span class="k">}</span>_4.png
+        <span class="k">else
+            </span><span class="nb">echo</span> <span class="s2">"4 convert：msg 不存在 使用3"</span>
+            <span class="nv">qrcode_path_with_msg</span><span class="o">=</span><span class="k">${</span><span class="nv">qrcode_path</span><span class="k">}</span>_3.png
+        <span class="k">fi
+
+    else</span>
+        <span class="c">#没有传 1 不需要msg，只给title</span>
+        convert <span class="nv">$qrcode_path</span> <span class="nt">-gravity</span> south <span class="nt">-pointsize</span> 10 <span class="nt">-fill</span> gray <span class="nt">-annotate</span> +0+0 <span class="nv">$qrcode_print_msg</span>  <span class="nv">$qrcode_path_with_msg</span>
+        <span class="nb">echo</span> <span class="s1">'/// oss 分发： 添加 二维码title='</span><span class="k">${</span><span class="nv">title</span><span class="k">}</span>
+    <span class="k">fi</span>
+
+<span class="o">}</span>
+
+<span class="c">#发布到阿里云OSS</span>
+<span class="k">function </span>upload_ipa_to_aliyunOSS <span class="o">()</span>
+<span class="o">{</span>
+    <span class="c">#更新plist的键值对：</span>
+    <span class="c">#    /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString ${version3number}" ${WeSingNotificationServiceExtension_plist}</span>
+    <span class="nv">manifest_path</span><span class="o">=</span><span class="k">${</span><span class="nv">exportPath</span><span class="k">}</span>/manifest.plist
+    <span class="nb">echo</span> <span class="s1">'/// oss 分发： manifest_path='</span><span class="k">${</span><span class="nv">manifest_path</span><span class="k">}</span>
+    
+    <span class="nv">oss_bucket</span><span class="o">=</span><span class="s2">"oss_bucket_name"</span>
+    <span class="nv">oss_platform</span><span class="o">=</span><span class="s2">"iOS"</span>
+    <span class="nv">oss_bucket_path</span><span class="o">=</span><span class="nv">$oss_platform</span>/<span class="k">${</span><span class="nv">TARGET_NAME</span><span class="k">}</span>/<span class="nv">$configurationName</span>/<span class="k">${</span><span class="nv">channel_name</span><span class="k">}</span>/<span class="k">${</span><span class="nv">BuildNo</span><span class="k">}</span>/<span class="k">${</span><span class="nv">TARGET_NAME</span><span class="k">}</span>_<span class="k">${</span><span class="nv">channel_name</span><span class="k">}</span>_<span class="nv">$configurationName_</span><span class="k">${</span><span class="nv">BuildNo</span><span class="k">}</span>
+    <span class="nv">oss_path</span><span class="o">=</span><span class="s2">"oss://</span><span class="nv">$oss_bucket</span><span class="s2">/</span><span class="nv">$oss_bucket_path</span><span class="s2">"</span>
+    <span class="nv">oss_url</span><span class="o">=</span><span class="s2">"https://</span><span class="nv">$oss_bucket</span><span class="s2">.oss-cn-beijing.aliyuncs.com/</span><span class="nv">$oss_bucket_path</span><span class="s2">"</span>
+
+    <span class="nv">oss_ipa_upload_url</span><span class="o">=</span><span class="nv">$oss_path</span><span class="s2">".ipa"</span>
+    <span class="nv">oss_ipa_url</span><span class="o">=</span><span class="nv">$oss_url</span><span class="s2">".ipa"</span>
+
+    <span class="c">#icon下载地址配置</span>
+    <span class="nv">oss_icon_url</span><span class="o">=</span><span class="s2">"</span><span class="k">${</span><span class="nv">aliyunOSSBuicket</span><span class="k">}</span><span class="s2">/icon/icon.png"</span>
+    <span class="nv">oss_icon_fs_url</span><span class="o">=</span><span class="s2">"</span><span class="k">${</span><span class="nv">aliyunOSSBuicket</span><span class="k">}</span><span class="s2">/icon/icon_fs.png"</span>
+
+    
+    <span class="c">#修改ipa下载地址</span>
+    /usr/libexec/PlistBuddy <span class="nt">-c</span> <span class="s2">"Set :items:0:assets:0:url </span><span class="nv">$oss_ipa_url</span><span class="s2">"</span> <span class="nv">$manifest_path</span>
+
+    <span class="c">#修改icon地址</span>
+    /usr/libexec/PlistBuddy <span class="nt">-c</span> <span class="s2">"Set :items:0:assets:1:url </span><span class="nv">$oss_icon_url</span><span class="s2">"</span> <span class="nv">$manifest_path</span>
+
+    <span class="c">#修改icon full size地址</span>
+    /usr/libexec/PlistBuddy <span class="nt">-c</span> <span class="s2">"Set :items:0:assets:2:url </span><span class="nv">$oss_icon_fs_url</span><span class="s2">"</span> <span class="nv">$manifest_path</span>
+
+
+    <span class="c">#传ipa</span>
+    ossutil <span class="nb">cp</span> <span class="k">${</span><span class="nv">IPA_PATH</span><span class="k">}</span> <span class="nv">$oss_ipa_upload_url</span> <span class="nt">-f</span>
+    
+    <span class="c">#传manifest</span>
+    <span class="nv">oss_manifest_extension</span><span class="o">=</span><span class="s2">"plist"</span>
+    <span class="nv">oss_manifest_upload_url</span><span class="o">=</span><span class="nv">$oss_path</span><span class="s2">"."</span><span class="nv">$oss_manifest_extension</span>
+    <span class="nv">oss_manifest_url</span><span class="o">=</span><span class="nv">$oss_url</span><span class="s2">"."</span><span class="nv">$oss_manifest_extension</span>
+    ossutil <span class="nb">cp</span> <span class="k">${</span><span class="nv">manifest_path</span><span class="k">}</span> <span class="nv">$oss_manifest_upload_url</span> <span class="nt">-f</span>
+    
+    <span class="c">#上述做归档后，生成下载二维码</span>
+    <span class="nv">download_url</span><span class="o">=</span><span class="s2">"itms-services://?action=download-manifest&amp;url="</span><span class="nv">$oss_manifest_url</span>
+    <span class="nv">qrcode_path</span><span class="o">=</span><span class="k">${</span><span class="nv">exportPath</span><span class="k">}</span>/<span class="k">${</span><span class="nv">TARGET_NAME</span><span class="k">}</span>_<span class="k">${</span><span class="nv">BuildNo</span><span class="k">}</span>.png
+    
+    <span class="c">#TODO: 这里需要安装下工具 qrencode [brew install qrencode]</span>
+    bash <span class="nv">$build_ext_path</span>/build_tools/build_tools.sh <span class="s2">"qrencode"</span>
+
+    qrencode <span class="nt">-o</span> <span class="nv">$qrcode_path</span> <span class="nv">$download_url</span>
+    
+    <span class="c">#将二维码上传到oss</span>
+    <span class="nv">oss_qrencode_extension</span><span class="o">=</span><span class="s2">"png"</span>
+    <span class="nv">oss_qrencode_upload_url</span><span class="o">=</span><span class="nv">$oss_path</span><span class="s2">"."</span><span class="nv">$oss_qrencode_extension</span>
+    <span class="nv">qrcode_path_with_msg</span><span class="o">=</span><span class="k">${</span><span class="nv">qrcode_path</span><span class="k">}</span>_with_msg
+        
+    <span class="c">#如果需要二维码打上log信息则调用</span>
+    <span class="nv">need_msg</span><span class="o">=</span>1
+    add_log_commit_title_msg_to_qrcode <span class="nv">$need_msg</span>
+        
+    <span class="c">#上传到阿里云oss</span>
+    ossutil <span class="nb">cp</span> <span class="k">${</span><span class="nv">qrcode_path_with_msg</span><span class="k">}</span> <span class="nv">$oss_qrencode_upload_url</span> <span class="nt">-f</span>
+    
+    <span class="c">#二维码的url 通知出来</span>
+    <span class="nb">export </span><span class="nv">oss_app_download_qrcode_url</span><span class="o">=</span><span class="nv">$oss_url</span><span class="s2">"."</span><span class="nv">$oss_qrencode_extension</span>
+    <span class="nb">echo</span> <span class="s1">'/// oss 分发： 二维码的oss_app_download_qrcode_url='</span><span class="k">${</span><span class="nv">oss_app_download_qrcode_url</span><span class="k">}</span>
+<span class="o">}</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<ul>
+  <li><strong>TestFlight</strong></li>
+</ul>
+
+<p>​	打灰度包将执行ipa上传到AppStore后台的操作（服务端环境是正式环境，未来有外网的灰度需求可改成灰度环境）</p>
+
+<ul>
+  <li><strong>Release</strong></li>
+</ul>
+
+<p>​	打正式包将执行ipa上传到AppStore后台的操作（服务端环境是正式环境）</p>
+
+<ul>
+  <li><strong>TFinner</strong></li>
+</ul>
+
+<p>​	打灰度包给没有添加测试设备的同事下载，解决100设备不够用（带Debug模式、可切换环境、上传到AppStore）</p>
+
+<p>AppStore分发：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+</pre></td><td class="rouge-code"><pre><span class="c">#发布到AppStore</span>
+<span class="k">function </span>upload_ipa_to_AppStore <span class="o">()</span>
+<span class="o">{</span>
+    <span class="nb">echo</span> <span class="s1">'/// 上传App Store 开始'</span>
+    xcrun altool <span class="nt">--validate-app</span> <span class="nt">-f</span>  <span class="nv">$IPA_PATH</span> <span class="nt">--type</span>  ios  <span class="nt">--apiKey</span> <span class="nv">$appStore_apikey</span> <span class="nt">--apiIssuer</span> <span class="nv">$appStore_apiIssuer</span>
+    xcrun altool <span class="nt">--upload-app</span> <span class="nt">-f</span>  <span class="nv">$IPA_PATH</span> <span class="nt">--type</span>  ios  <span class="nt">--apiKey</span> <span class="nv">$appStore_apikey</span> <span class="nt">--apiIssuer</span> <span class="nv">$appStore_apiIssuer</span>
+    <span class="nb">echo</span> <span class="s1">'/// 上传App Store 结束'</span>
+<span class="o">}</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<h4 id="232-通知">2.3.2 通知</h4>
+
+<p>​	通知模块目前通过钉钉通知，未来也可改成邮件甚至其他方式，考量亦是如此。通知实现内容可定制，当参数notify不为空，才需要通知测试团队进行更新：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre></td><td class="rouge-code"><pre> <span class="k">if</span> <span class="o">[</span> <span class="nt">-z</span> <span class="s2">"</span><span class="nv">$notify</span><span class="s2">"</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+        <span class="c"># 空，不发通知</span>
+        <span class="nb">echo</span> <span class="s1">'/// 本次打包静默，不发通知 '</span>
+ <span class="k">else</span>
+    ....
+ <span class="k">fi</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>​	通知通过 build_notification.sh 实现如下逻辑：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+</pre></td><td class="rouge-code"><pre><span class="c">#构建通知</span>
+<span class="k">function </span>notification<span class="o">()</span>
+<span class="o">{</span>
+    <span class="nv">param</span><span class="o">=</span><span class="nv">$1</span>
+    <span class="k">if</span> <span class="o">[</span> <span class="nt">-z</span> <span class="s2">"</span><span class="nv">$param</span><span class="s2">"</span> <span class="o">]</span><span class="p">;</span> <span class="k">then
+        </span><span class="nb">echo</span> <span class="s1">'///构建通知（参数为空）'</span>
+        notify
+    <span class="k">else
+        </span><span class="nb">echo</span> <span class="s1">'///构建通知（参数不为空）：'</span><span class="nv">$param</span>
+        <span class="k">if</span> <span class="o">[</span> <span class="s2">"</span><span class="k">${</span><span class="nv">param</span><span class="k">}</span><span class="s2">"</span> <span class="o">=</span> <span class="s2">"AppStore"</span> <span class="o">]</span><span class="p">;</span> <span class="k">then
+            </span><span class="nb">echo</span> <span class="s1">'///构建通知AppStore'</span>
+            notify_AppStore
+        <span class="k">else
+            </span><span class="nb">echo</span> <span class="s1">'///构建异常（参数:）'</span><span class="nv">$param</span>
+            notify_fail <span class="nv">$param</span>
+        <span class="k">fi
+    fi</span>
+
+<span class="o">}</span>
+
+<span class="nb">echo</span> <span class="s1">'///构建通知（'</span><span class="nv">$1</span><span class="s1">')'</span>
+
+<span class="c">#通知</span>
+notification <span class="nv">$1</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>通知兼容蒲公英下载地址 + oss下载地址：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+</pre></td><td class="rouge-code"><pre><span class="c">#执行通知逻辑</span>
+<span class="k">function </span>notify<span class="o">()</span>
+<span class="o">{</span>
+    <span class="nv">modify_msg</span><span class="o">=</span><span class="k">${</span><span class="nv">git_log</span><span class="k">}</span>
+    <span class="nv">ProductName</span><span class="o">=</span><span class="k">${</span><span class="nv">xcodeProductName</span><span class="k">}</span>
+    <span class="nv">downloadPrefix</span><span class="o">=</span><span class="k">${</span><span class="nv">PrefixID</span><span class="k">}</span>
+    <span class="nv">channel</span><span class="o">=</span><span class="k">${</span><span class="nv">channel_name</span><span class="k">}</span>
+    <span class="nv">title</span><span class="o">=</span><span class="k">${</span><span class="nv">buildName</span><span class="k">}</span>
+    
+    <span class="nv">app_donwnload_url</span><span class="o">=</span><span class="s2">""</span>
+    <span class="nv">pgy_app_donwnload_url</span><span class="o">=</span><span class="s2">""</span>
+    <span class="c">#启用传pgy</span>
+    <span class="k">if</span> <span class="o">[</span> <span class="s2">"</span><span class="k">${</span><span class="nv">use_pgy_publish</span><span class="k">}</span><span class="s2">"</span> <span class="o">=</span> <span class="s2">"1"</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+        <span class="c">#采用直接 拼 channel后缀</span>
+        <span class="nv">shortUrl</span><span class="o">=</span><span class="k">${</span><span class="nv">downloadPrefix</span><span class="k">}${</span><span class="nv">ProductName</span><span class="k">}${</span><span class="nv">channel</span><span class="k">}</span>
+
+
+        <span class="nv">pgy_app_donwnload_url</span><span class="o">=</span><span class="s2">"https://www.xcxwo.com/</span><span class="k">${</span><span class="nv">shortUrl</span><span class="k">}</span><span class="s2">"</span>
+        <span class="nb">echo</span> <span class="s2">"short_download_url = "</span><span class="nv">$short_download_url</span>
+        <span class="k">if</span> <span class="o">[</span> <span class="nt">-z</span> <span class="s2">"</span><span class="nv">$short_download_url</span><span class="s2">"</span> <span class="o">]</span><span class="p">;</span> <span class="k">then
+            </span><span class="nv">app_donwnload_url</span><span class="o">=</span><span class="nv">$pgy_app_donwnload_url</span>
+        <span class="k">else
+            </span><span class="nv">app_donwnload_url</span><span class="o">=</span><span class="nv">$short_download_url</span>
+        <span class="k">fi</span>
+        <span class="c">#蒲公英下载地址</span>
+        <span class="nb">echo</span> <span class="s2">"通知：蒲公英分发，下载地址：'</span><span class="k">${</span><span class="nv">app_donwnload_url</span><span class="k">}</span><span class="s2">'"</span>
+    <span class="k">fi</span>
+    
+    
+    <span class="c">#启用传oss</span>
+    <span class="k">if</span> <span class="o">[</span> <span class="s2">"</span><span class="k">${</span><span class="nv">use_oss_publish</span><span class="k">}</span><span class="s2">"</span> <span class="o">=</span> <span class="s2">"1"</span> <span class="o">]</span><span class="p">;</span> <span class="k">then
+        if</span> <span class="o">[</span> <span class="nt">-z</span> <span class="s2">"</span><span class="nv">$oss_app_download_qrcode_url</span><span class="s2">"</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+            <span class="c">#oss下载地址为空</span>
+            <span class="nb">echo</span> <span class="s2">"通知：oss_app_download_qrcode_url 为空则 下载地址：'</span><span class="k">${</span><span class="nv">app_donwnload_url</span><span class="k">}</span><span class="s2">'"</span>
+        <span class="k">else
+            </span><span class="nb">echo</span> <span class="s2">"通知：oss_app_download_qrcode_url 不为空 下载地址：'</span><span class="k">${</span><span class="nv">app_donwnload_url</span><span class="k">}</span><span class="s2">' and '</span><span class="nv">$oss_app_download_qrcode_url</span><span class="s2">'"</span>
+            <span class="nv">app_donwnload_url</span><span class="o">=</span><span class="k">${</span><span class="nv">pgy_app_donwnload_url</span><span class="k">}</span><span class="s1">'\n\n'</span>oss下载地址:<span class="nv">$oss_app_download_qrcode_url</span>
+
+        <span class="k">fi
+    fi
+    
+    </span><span class="nb">echo</span> <span class="s2">"通知 COME下载地址：'</span><span class="k">${</span><span class="nv">app_donwnload_url</span><span class="k">}</span><span class="s2">'"</span>
+    <span class="nb">echo</span> <span class="s2">"通知 内容：'""'</span><span class="k">${</span><span class="nv">ProductName</span><span class="k">}</span><span class="s2">' App更新：'</span><span class="k">${</span><span class="nv">title</span><span class="k">}</span><span class="s2">'</span><span class="se">\n</span><span class="s2">'</span><span class="k">${</span><span class="nv">modify_msg</span><span class="k">}</span><span class="s2">'</span><span class="se">\n</span><span class="s2">下载地址：'</span><span class="k">${</span><span class="nv">app_donwnload_url</span><span class="k">}</span><span class="s2">'"</span>
+    
+    <span class="k">if</span> <span class="o">[</span> <span class="s2">"</span><span class="k">${</span><span class="nv">notify</span><span class="k">}</span><span class="s2">"</span> <span class="o">=</span> <span class="s2">"1"</span> <span class="o">]</span><span class="p">;</span> <span class="k">then
+        </span><span class="nb">echo</span> <span class="s1">'/// 本次打发通知到群里 '</span>
+    <span class="k">elif</span> <span class="o">[</span> <span class="s2">"</span><span class="k">${</span><span class="nv">notify</span><span class="k">}</span><span class="s2">"</span> <span class="o">=</span> <span class="s2">"2"</span> <span class="o">]</span><span class="p">;</span> <span class="k">then
+        </span><span class="nb">echo</span> <span class="s1">'/// 本次打发通知到内部群里 '</span>
+        <span class="nv">access_token</span><span class="o">=</span><span class="nv">$internal_access_token</span>
+    <span class="k">else
+        </span><span class="nb">echo</span> <span class="s1">'/// 本次打发通知参数'</span><span class="k">${</span><span class="nv">notify</span><span class="k">}</span>
+    <span class="k">fi
+    
+    if</span> <span class="o">[</span> <span class="nt">-z</span> <span class="s2">"</span><span class="nv">$notify</span><span class="s2">"</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+        <span class="c"># 空，不发通知</span>
+        <span class="nb">echo</span> <span class="s1">'/// 本次打包静默，不发通知 '</span>
+
+    <span class="k">else
+        </span><span class="nb">echo</span> <span class="s1">'/// 本次打包发通知 '</span>
+        <span class="c">#发送发版通知</span>
+        curl <span class="s1">'https://oapi.dingtalk.com/robot/send?access_token='</span><span class="k">${</span><span class="nv">access_token</span><span class="k">}</span> <span class="se">\</span>
+            <span class="nt">-H</span> <span class="s1">'Content-Type: application/json'</span> <span class="se">\</span>
+            <span class="nt">-d</span> <span class="s1">'{"msgtype": "text",
+                "at": {
+                "atMobiles":[
+                    "xx1"
+                    "xx2"
+                    "xx3"
+                    "xx4"
+                    "xx5"
+                    "xx6"
+                    "xx7"
+                ],
+                "isAtAll": false
+                },
+                 "text": {
+                      "content": "'</span><span class="k">${</span><span class="nv">ProductName</span><span class="k">}</span><span class="s1">' App更新：'</span><span class="k">${</span><span class="nv">title</span><span class="k">}</span><span class="s1">'\n'</span><span class="k">${</span><span class="nv">modify_msg</span><span class="k">}</span><span class="s1">'\n下载地址：'</span><span class="k">${</span><span class="nv">app_donwnload_url</span><span class="k">}</span><span class="s1">'"            }
+               }'</span>
+               
+               
+        <span class="nb">echo</span> <span class="s1">'///-------------------------------------------------------'</span>
+        <span class="nb">echo</span> <span class="s1">'/// 通知Come3 '</span>
+        <span class="nb">echo</span> <span class="s1">'///-------------------------------------------------------'</span>
+    <span class="k">fi</span>
+
+<span class="o">}</span>
+
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>​	构建失败通知：</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+</pre></td><td class="rouge-code"><pre><span class="c">#打包出错时通知</span>
+<span class="k">function </span>notify_fail<span class="o">()</span>
+<span class="o">{</span>
+    <span class="c">#发布到移动端内部群</span>
+    <span class="nv">access_token</span><span class="o">=</span><span class="nv">$internal_access_token</span>
+    <span class="c">#产物</span>
+    <span class="nv">ProductName</span><span class="o">=</span><span class="k">${</span><span class="nv">xcodeProductName</span><span class="k">}</span>
+    <span class="c">#渠道名</span>
+    <span class="nv">channel</span><span class="o">=</span><span class="k">${</span><span class="nv">channel_name</span><span class="k">}</span>
+    <span class="c">#流水线名称</span>
+    <span class="nv">title</span><span class="o">=</span><span class="k">${</span><span class="nv">buildName</span><span class="k">}</span>
+    
+    <span class="c">#失败原因</span>
+    <span class="nv">reson</span><span class="o">=</span><span class="nv">$1</span>
+    
+    <span class="nb">echo</span> <span class="s1">'/// 本次打包异常：发通知到内部群 '</span>
+    <span class="c">#发送发版通知</span>
+    curl <span class="s1">'https://oapi.dingtalk.com/robot/send?access_token='</span><span class="k">${</span><span class="nv">access_token</span><span class="k">}</span> <span class="se">\</span>
+        <span class="nt">-H</span> <span class="s1">'Content-Type: application/json'</span> <span class="se">\</span>
+        <span class="nt">-d</span> <span class="s1">'{"msgtype": "text",
+            "at": {
+            "atMobiles":[
+                "DD1",
+                "DD2"
+            ],
+            "isAtAll": false
+            },
+             "text": {
+                  "content": "❌构建失败:\nApp:'</span><span class="k">${</span><span class="nv">ProductName</span><span class="k">}</span><span class="s1">'\n原  因：'</span><span class="k">${</span><span class="nv">reson</span><span class="k">}</span><span class="s1">'\n流水线：'</span><span class="k">${</span><span class="nv">title</span><span class="k">}</span><span class="s1">'\n渠  道：'</span><span class="k">${</span><span class="nv">buildName</span><span class="k">}</span><span class="s1">'"}
+           }'</span>
+           
+           
+    <span class="nb">echo</span> <span class="s1">'///-------------------------------------------------------'</span>
+    <span class="nb">echo</span> <span class="s1">'/// 构建通知'</span>
+    <span class="nb">echo</span> <span class="s1">'///-------------------------------------------------------'</span>
+<span class="o">}</span>
+
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>构建到AppStore时需要测试团队对上线进行验证：也发送下通知</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+</pre></td><td class="rouge-code"><pre><span class="c">#打包AppStore通知，通知到群给出TestFlight下载链接二维码</span>
+<span class="k">function </span>notify_AppStore<span class="o">()</span>
+<span class="o">{</span>
+    <span class="c">#发布到移动端内部群</span>
+    <span class="nv">access_token</span><span class="o">=</span><span class="nv">$internal_access_token</span>
+    <span class="c">#产物</span>
+    <span class="nv">ProductName</span><span class="o">=</span><span class="k">${</span><span class="nv">xcodeProductName</span><span class="k">}</span>
+    <span class="c">#渠道名</span>
+    <span class="nv">channel</span><span class="o">=</span><span class="k">${</span><span class="nv">channel_name</span><span class="k">}</span>
+    <span class="c">#流水线名称</span>
+    <span class="nv">title</span><span class="o">=</span><span class="k">${</span><span class="nv">buildName</span><span class="k">}</span>
+    
+    <span class="c">#testFlight 二维码in OSS</span>
+    <span class="nv">downloadTF</span><span class="o">=</span><span class="s2">"</span><span class="k">${</span><span class="nv">aliyunOSSBuicket</span><span class="k">}</span><span class="s2">/AppStoreValid/testflight.png"</span>
+    
+    <span class="nb">echo</span> <span class="s1">'/// 本次打包构建到AppStore：发通知到内部群 '</span>
+    <span class="c">#发送发版通知</span>
+    curl <span class="s1">'https://oapi.dingtalk.com/robot/send?access_token='</span><span class="k">${</span><span class="nv">access_token</span><span class="k">}</span> <span class="se">\</span>
+        <span class="nt">-H</span> <span class="s1">'Content-Type: application/json'</span> <span class="se">\</span>
+        <span class="nt">-d</span> <span class="s1">'{"msgtype": "text",
+            "at": {
+            "atMobiles":[
+                "DD1",
+                "DD2"
+            ],
+            "isAtAll": false
+            },
+             "text": {
+                  "content": "✅AppSore构建成功:\nApp:'</span><span class="k">${</span><span class="nv">ProductName</span><span class="k">}</span><span class="s1">'\n构建名：'</span><span class="k">${</span><span class="nv">configurationName</span><span class="k">}</span><span class="s1">'\n流水线：'</span><span class="k">${</span><span class="nv">title</span><span class="k">}</span><span class="s1">'\n版本号：'</span><span class="k">${</span><span class="nv">xcodeVersion3number</span><span class="k">}</span><span class="s1">'\n构建号：'</span><span class="k">${</span><span class="nv">BuildNo</span><span class="k">}</span><span class="s1">'\nTestFlight:'</span><span class="k">${</span><span class="nv">downloadTF</span><span class="k">}</span><span class="s1">'"}
+           }'</span>
+           
+           
+    <span class="nb">echo</span> <span class="s1">'///-------------------------------------------------------'</span>
+    <span class="nb">echo</span> <span class="s1">'/// 构建通知'</span>
+    <span class="nb">echo</span> <span class="s1">'///-------------------------------------------------------'</span>
+<span class="o">}</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<h4 id="233-归档">2.3.3 归档</h4>
+
+<p>​	目前在Release、TestFlight 打包时将ipa与dysm打包上传到简单云制品库</p>
+
+<p>​	构建归档，将ipa与dysm打程zip包</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+</pre></td><td class="rouge-code"><pre><span class="k">function </span>ProductCollection<span class="o">()</span>
+<span class="o">{</span>
+    <span class="k">if</span> <span class="o">[</span> <span class="s2">"</span><span class="k">${</span><span class="nv">configurationName</span><span class="k">}</span><span class="s2">"</span> <span class="o">=</span> <span class="s2">"Release"</span> <span class="o">]</span> <span class="o">||</span> <span class="o">[</span> <span class="s2">"</span><span class="k">${</span><span class="nv">configurationName</span><span class="k">}</span><span class="s2">"</span> <span class="o">=</span> <span class="s2">"TestFlight"</span> <span class="o">]</span><span class="p">;</span> <span class="k">then
+
+        </span>dSYMCollection
+    
+        IPACollection
+        
+        <span class="nb">export </span><span class="nv">ProductCollectionPath</span><span class="o">=</span><span class="k">${</span><span class="nv">dSYM_dict_PATH</span><span class="k">}</span>/ProductCollection.zip
+        <span class="nb">echo</span> <span class="s2">"ProductCollectionPath="</span><span class="nv">$ProductCollectionPath</span>
+        zip <span class="nv">$ProductCollectionPath</span> <span class="k">${</span><span class="nv">dSYMZip_PATH</span><span class="k">}</span> <span class="k">${</span><span class="nv">IPAZip_PATH</span><span class="k">}</span>
+        <span class="c">#执行归档,(ipa+dSYM)并找个地方存起来</span>
+        bash <span class="nv">$build_ext_path</span>/<span class="nv">$collection_sh</span>
+    <span class="k">fi</span>
+
+<span class="o">}</span>
+
+<span class="k">function </span>dSYMCollection<span class="o">()</span>
+<span class="o">{</span>
+    <span class="c"># zip and copy dSYM</span>
+    <span class="nb">echo</span> <span class="s2">"dSYMCollection"</span>
+
+    <span class="nb">cd</span> <span class="k">${</span><span class="nv">build_path</span><span class="k">}</span>/Build/Products/<span class="k">${</span><span class="nv">configurationName</span><span class="k">}</span><span class="nt">-iphoneos</span>
+    find <span class="nb">.</span> <span class="nt">-name</span> <span class="s1">'*.dSYM'</span> | zip <span class="nt">-r</span> <span class="k">${</span><span class="nv">dSYMZip_PATH</span><span class="k">}</span> -@
+    find <span class="nb">.</span> <span class="nt">-name</span> <span class="s1">'*.dSYM'</span> <span class="nt">-exec</span> <span class="nb">cp</span> <span class="nt">-R</span> <span class="o">{}</span> <span class="k">${</span><span class="nv">dSYM_dict_PATH</span><span class="k">}</span> <span class="se">\;</span>
+    <span class="nb">cd</span> -
+    <span class="nb">echo</span> <span class="s2">"Copy dSYM.zip file success save path:"</span> <span class="k">${</span><span class="nv">dSYMZip_PATH</span><span class="k">}</span>
+<span class="o">}</span>
+
+<span class="k">function </span>IPACollection<span class="o">()</span>
+<span class="o">{</span>
+    <span class="c"># zip and copy dSYM</span>
+    <span class="nb">echo</span> <span class="s2">"IPACollection"</span>
+    <span class="nb">cd</span> <span class="k">${</span><span class="nv">build_path</span><span class="k">}</span>/Build/Products/<span class="k">${</span><span class="nv">configurationName</span><span class="k">}</span><span class="nt">-iphoneos</span>
+    find <span class="nb">.</span> <span class="nt">-name</span> <span class="s1">'*.ipa'</span> | zip <span class="nt">-r</span> <span class="k">${</span><span class="nv">IPAZip_PATH</span><span class="k">}</span> -@
+    find <span class="nb">.</span> <span class="nt">-name</span> <span class="s1">'*.ipa'</span> <span class="nt">-exec</span> <span class="nb">cp</span> <span class="nt">-R</span> <span class="o">{}</span> <span class="k">${</span><span class="nv">dSYM_dict_PATH</span><span class="k">}</span> <span class="se">\;</span>
+    <span class="nb">cd</span> -
+    <span class="nb">echo</span> <span class="s2">"Copy IPAZip_PATH.zip file success save path:"</span> <span class="k">${</span><span class="nv">IPAZip_PATH</span><span class="k">}</span>
+<span class="o">}</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>​	将zip包归档到简单云</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre></td><td class="rouge-code"><pre><span class="k">function </span>upload_to_store<span class="o">()</span>
+<span class="o">{</span>
+    <span class="nb">export </span><span class="nv">p</span><span class="o">=</span><span class="nv">$1</span>
+    <span class="nb">echo</span> <span class="s1">'/// 上传 dsym ipa 到制品库 '</span><span class="k">${</span><span class="nv">v</span><span class="k">}</span><span class="s1">'pkgName='</span><span class="k">${</span><span class="nv">pkgName</span><span class="k">}</span>
+    <span class="nb">echo</span> <span class="s2">"dSYMZip_PATH = "</span><span class="k">${</span><span class="nv">dSYMZip_PATH</span><span class="k">}</span><span class="s2">"https://PSC-devops.com/pkg/PSC/raw/OperationsAppAnddSYM/release?version="</span><span class="k">${</span><span class="nv">v</span><span class="k">}</span><span class="s2">"&amp;pkgName="</span><span class="k">${</span><span class="nv">pkgName</span><span class="k">}</span>
+    <span class="c">#上传简单云制品库</span>
+    curl <span class="nt">-F</span> <span class="s2">"file=@"</span><span class="k">${</span><span class="nv">p</span><span class="k">}</span> <span class="nt">-u</span> 简单云账号:简单云密码 <span class="s2">"https://PSC-devops.com/pkg/PSC/raw/OperationsAppAnddSYM/release?version="</span><span class="k">${</span><span class="nv">v</span><span class="k">}</span><span class="s2">"&amp;pkgName="</span><span class="k">${</span><span class="nv">pkgName</span><span class="k">}</span> <span class="nt">-k</span>
+<span class="o">}</span>
+        
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>​	将dSYM上传到bugly，用于定位线上crash：</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+</pre></td><td class="rouge-code"><pre><span class="k">function </span>upload_dSYM_to_bugly<span class="o">()</span>
+<span class="o">{</span>
+    <span class="nb">export </span><span class="nv">p</span><span class="o">=</span><span class="k">${</span><span class="nv">dSYM_dict_PATH</span><span class="k">}</span>
+    
+    <span class="k">if</span> <span class="o">[</span> <span class="s2">"</span><span class="k">${</span><span class="nv">TARGET_NAME</span><span class="k">}</span><span class="s2">"</span> <span class="o">=</span> <span class="s2">"PSCDemoiOS"</span> <span class="o">]</span><span class="p">;</span> <span class="k">then
+        </span><span class="nv">bugly_appid</span><span class="o">=</span><span class="nv">$Demo_bugly_appid</span>
+        <span class="nv">bugly_appkey</span><span class="o">=</span><span class="nv">$Demo_bugly_appkey</span>
+    <span class="k">fi
+    
+    if</span> <span class="o">[</span> <span class="s2">"</span><span class="k">${</span><span class="nv">TARGET_NAME</span><span class="k">}</span><span class="s2">"</span> <span class="o">=</span> <span class="s2">"Operations"</span> <span class="o">]</span><span class="p">;</span> <span class="k">then
+        </span><span class="nv">bugly_appid</span><span class="o">=</span><span class="nv">$operations_bugly_appid</span>
+        <span class="nv">bugly_appkey</span><span class="o">=</span><span class="nv">$operations_bugly_appkey</span>
+    <span class="k">fi
+    
+    </span><span class="nb">echo</span> <span class="s2">"/// 上传 dsym path </span><span class="k">${</span><span class="nv">p</span><span class="k">}</span><span class="s2">"</span>
+    <span class="nb">echo</span> <span class="s2">"/// 上传 dsym target </span><span class="k">${</span><span class="nv">TARGET_NAME</span><span class="k">}</span><span class="s2">"</span>
+    <span class="nb">echo</span> <span class="s2">"/// 上传 dsym bugly_appid </span><span class="k">${</span><span class="nv">bugly_appid</span><span class="k">}</span><span class="s2">"</span>
+    <span class="nb">echo</span> <span class="s2">"/// 上传 dsym bugly_appkey </span><span class="k">${</span><span class="nv">bugly_appkey</span><span class="k">}</span><span class="s2">"</span>
+    <span class="nb">echo</span> <span class="s1">'/// 上传 dsym bugly '</span><span class="k">${</span><span class="nv">versionName</span><span class="k">}</span><span class="s1">'pkgName='</span><span class="k">${</span><span class="nv">pkgName</span><span class="k">}</span>
+    
+    <span class="c">#切换java 版本在流水线实现，这边实现不了</span>
+    java <span class="nt">-version</span>
+<span class="c">#    jdk8</span>
+<span class="c">#    java -version</span>
+    
+    <span class="nv">bugly_jar_path</span><span class="o">=</span><span class="nv">$build_ext_path</span>/collection_res/buglyqq-upload-symbol/buglyqq-upload-symbol.jar
+    
+    java <span class="nt">-jar</span> <span class="k">${</span><span class="nv">bugly_jar_path</span><span class="k">}</span> <span class="nt">-appid</span> <span class="k">${</span><span class="nv">bugly_appid</span><span class="k">}</span> <span class="nt">-appkey</span> <span class="k">${</span><span class="nv">bugly_appkey</span><span class="k">}</span> <span class="nt">-bundleid</span> <span class="k">${</span><span class="nv">pkgName</span><span class="k">}</span> <span class="nt">-version</span> <span class="k">${</span><span class="nv">versionName</span><span class="k">}</span> <span class="nt">-platform</span> IOS <span class="nt">-inputSymbol</span> <span class="k">${</span><span class="nv">p</span><span class="k">}</span>
+<span class="o">}</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<h2 id="3补充说明">3.补充说明</h2>
+
+<p>​	打包脚本抽离成git submodule，以供各个工程项目的集成，减少维护成本，如果没有跟主工程一起更新，则每次构建时需要同步下最新的脚本</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre><span class="c">#使用了gitsubmodule 构建组件，兼容git 检出不兼容，需要先执行 git submodule update --init --recursive</span>
+git submodule update <span class="nt">--init</span> <span class="nt">--recursive</span>
+<span class="c">#拉取自模块更新</span>
+git submodule update <span class="nt">--remote</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<h2 id="4author">4.Author</h2>
+
+<p>​	有任何问题，欢迎联系：wangshu2015@gmail.com</p>
+
+
+
+                <hr style="visibility: hidden;">
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2023/10/07/%E6%8A%93%E5%8C%85%E5%AE%9E%E8%B7%B5/" data-toggle="tooltip" data-placement="top" title="Charles HTTPS实践">
+                        Previous<br>
+                        <span>Charles HTTPS实践</span>
+                        </a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="/2024/01/08/ios/" data-toggle="tooltip" data-placement="top" title="iOS组件化实现之：实用工具沉淀及介绍">
+                        Next<br>
+                        <span>iOS组件化实现之：实用工具沉淀及介绍</span>
+                        </a>
+                    </li>
+                    
+                </ul>
+                <hr style="visibility: hidden;">
+
+                
+                <!-- disqus 评论框 start -->
+                <div class="comment">
+                    <div id="disqus_thread" class="disqus-thread"></div>
+                </div>
+                <!-- disqus 评论框 end -->
+                
+
+                
+            </div>  
+
+    <!-- Side Catalog Container -->
+        
+            <div class="
+                col-lg-2 col-lg-offset-0
+                visible-lg-block
+                sidebar-container
+                catalog-container">
+                <div class="side-catalog">
+                    <hr class="hidden-sm hidden-xs">
+                    <h5>
+                        <a class="catalog-toggle" href="#">CATALOG</a>
+                    </h5>
+                    <ul class="catalog-body"></ul>
+                </div>
+            </div>
+        
+
+    <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+
+
+<section>
+    
+        <hr class="hidden-sm hidden-xs">
+    
+    <h5><a href="/archive/">FEATURED TAGS</a></h5>
+    <div class="tags">
+        
+        
+        
+        
+        
+    </div>
+</section>
+
+
+                <!-- Friends Blog -->
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+<!-- add support for mathjax by voleking-->
+
+
+
+
+
+
+<!-- disqus 公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = "Cyp";
+    var disqus_identifier = "/2023/11/08/构建流水线实践";
+    var disqus_url = "http://localhost:4000/2023/11/08/%E6%9E%84%E5%BB%BA%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%AE%9E%E8%B7%B5/";
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<!-- disqus 公共JS代码 end -->
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'right',
+          // icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <!-- SNS Link -->
+                
+
+
+<ul class="list-inline text-center">
+
+
+  
+  
+  
+  
+  
+  
+  
+</ul>
+
+                <p class="copyright text-muted">
+                    Copyright &copy; PaysonChen Blog 2024
+                    <br>
+                    <!-- Powered by <a href="http://huangxuan.me">Hux Blog</a> | -->
+                 <!--    <iframe style="margin-left: 2px; margin-bottom:-5px;" frameborder="0" scrolling="0" width="100px"
+                        height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=huxpro&repo=huxpro.github.io&type=star&count=true">
+                    </iframe> -->
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<!-- Currently, only navbar scroll-down effect at desktop still depends on this -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js "></script>
+
+<!-- Simple Jekyll Search -->
+<script src="/js/simple-jekyll-search.min.js"></script>
+
+<!-- Service Worker -->
+
+<script src="/js/snackbar.js "></script>
+<script src="/js/sw-registration.js "></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+        var d = document, t = 'script',
+            o = d.createElement(t),
+            s = d.getElementsByTagName(t)[0];
+        o.src = u;
+        if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+        s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!--
+     Because of the native support for backtick-style fenced code blocks
+     right within the Markdown is landed in Github Pages,
+     From V1.6, There is no need for Highlight.js,
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/
+     - https://github.com/jneen/rouge/wiki/list-of-supported-languages-and-lexers
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+
+
+
+
+
+<!--fastClick.js -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js", function () {
+        var $nav = document.querySelector("nav");
+        if ($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+<!-- Side Catalog -->
+
+<script type="text/javascript">
+    function generateCatalog(selector) {
+
+        // interop with multilangual 
+        if ('' == 'true') {
+            _containerSelector = 'div.post-container.active'
+        } else {
+            _containerSelector = 'div.post-container'
+        }
+
+        // init
+        var P = $(_containerSelector), a, n, t, l, i, c;
+        a = P.find('h1,h2,h3,h4,h5,h6');
+
+        // clean
+        $(selector).html('')
+
+        // appending
+        a.each(function () {
+            n = $(this).prop('tagName').toLowerCase();
+            i = "#" + $(this).prop('id');
+            t = $(this).text();
+            c = $('<a href="' + i + '" rel="nofollow">' + t + '</a>');
+            l = $('<li class="' + n + '_nav"></li>').append(c);
+            $(selector).append(l);
+        });
+        return true;
+    }
+
+    generateCatalog(".catalog-body");
+
+    // toggle side catalog
+    $(".catalog-toggle").click((function (e) {
+        e.preventDefault();
+        $('.side-catalog').toggleClass("fold")
+    }))
+
+    /*
+     * Doc: https://github.com/davist11/jQuery-One-Page-Nav
+     * Fork by Hux to support padding
+     */
+    async("/js/jquery.nav.js", function () {
+        $('.catalog-body').onePageNav({
+            currentClass: "active",
+            changeHash: !1,
+            easing: "swing",
+            filter: "",
+            scrollSpeed: 700,
+            scrollOffset: 0,
+            scrollThreshold: .2,
+            begin: null,
+            end: null,
+            scrollChange: null,
+            padding: 80
+        });
+    });
+</script>
+
+
+
+<!-- Multi-Lingual -->
+
+
+<!-- Simple Jekyll Search -->
+<script>
+    // https://stackoverflow.com/questions/1912501/unescape-html-entities-in-javascript
+    function htmlDecode(input) {
+        var e = document.createElement('textarea');
+        e.innerHTML = input;
+        // handle case of empty input
+        return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
+    }
+
+    SimpleJekyllSearch({
+        searchInput: document.getElementById('search-input'),
+        resultsContainer: document.getElementById('search-results'),
+        json: '/search.json',
+        searchResultTemplate: '<div class="post-preview item"><a href="{url}"><h2 class="post-title">{title}</h2><h3 class="post-subtitle">{subtitle}</h3><hr></a></div>',
+        noResultsText: 'No results',
+        limit: 50,
+        fuzzy: false,
+        // a hack to get escaped subtitle unescaped. for some reason, 
+        // post.subtitle w/o escape filter nuke entire search.
+        templateMiddleware: function (prop, value, template) {
+            if (prop === 'subtitle' || prop === 'title') {
+                if (value.indexOf("code")) {
+                    return htmlDecode(value);
+                } else {
+                    return value;
+                }
+            }
+        }
+    });
+
+    $(document).ready(function () {
+        var $searchPage = $('.search-page');
+        var $searchOpen = $('.search-icon');
+        var $searchClose = $('.search-icon-close');
+        var $searchInput = $('#search-input');
+        var $body = $('body');
+
+        $searchOpen.on('click', function (e) {
+            e.preventDefault();
+            $searchPage.toggleClass('search-active');
+            var prevClasses = $body.attr('class') || '';
+            setTimeout(function () {
+                $body.addClass('no-scroll');
+            }, 400)
+
+            if ($searchPage.hasClass('search-active')) {
+                $searchClose.on('click', function (e) {
+                    e.preventDefault();
+                    $searchPage.removeClass('search-active');
+                    $body.attr('class', prevClasses);  // from closure 
+                });
+                $searchInput.focus();
+            }
+        });
+    });
+</script>
+
+
+<!-- Image to hack wechat -->
+<img src="/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

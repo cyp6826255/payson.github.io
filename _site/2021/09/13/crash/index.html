@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="description" content="与你一起发现更大的世界。">
+    <meta name="keywords"  content="PaysonChen,iOS,流媒体">
+    <meta name="theme-color" content="#000000">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="iOS 10.x 内存Crash 排查 纪要 - PaysonChen的博客 | PaysonChen Blog">
+    
+    <meta property="og:type" content="article">
+    <meta property="og:description" content="更新日期：2021-09-07
+">
+    
+    
+    <meta property="article:published_time" content="2021-09-13T00:00:00Z">
+    
+    
+    <meta property="article:author" content="PaysonChen">
+    
+    
+    
+    <meta property="og:image" content="http://localhost:4000">
+    <meta property="og:url" content="http://localhost:4000/2021/09/13/crash/">
+    <meta property="og:site_name" content="PaysonChen的博客 | PaysonChen Blog">
+    
+    <title>iOS 10.x 内存Crash 排查 纪要 - PaysonChen的博客 | PaysonChen Blog</title>
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/pwa/manifest.json">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/img/favicon.ico">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="http://localhost:4000/2021/09/13/crash/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">PaysonChen Blog</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div id="huxblog_navbar">
+                <div class="navbar-collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="/">Home</a>
+                        </li>
+                        
+                        
+                        
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                        
+                        
+                        <li>
+                            <a href="/archive/">Archive</a>
+                        </li>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        <li class="search-icon">
+                            <a href="javascript:void(0)">
+                                <i class="fa fa-search"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <script>
+        // Drop Bootstarp low-performance Navbar
+        // Use customize navbar with high-quality material design animation
+        // in high-perf jank-free CSS3 implementation
+        var $body = document.body;
+        var $toggle = document.querySelector('.navbar-toggle');
+        var $navbar = document.querySelector('#huxblog_navbar');
+        var $collapse = document.querySelector('.navbar-collapse');
+
+        var __HuxNav__ = {
+            close: function () {
+                $navbar.className = " ";
+                // wait until animation end.
+                setTimeout(function () {
+                    // prevent frequently toggle
+                    if ($navbar.className.indexOf('in') < 0) {
+                        $collapse.style.height = "0px"
+                    }
+                }, 400)
+            },
+            open: function () {
+                $collapse.style.height = "auto"
+                $navbar.className += " in";
+            }
+        }
+
+        // Bind Event
+        $toggle.addEventListener('click', function (e) {
+            if ($navbar.className.indexOf('in') > 0) {
+                __HuxNav__.close()
+            } else {
+                __HuxNav__.open()
+            }
+        })
+
+        /**
+         * Since Fastclick is used to delegate 'touchstart' globally
+         * to hack 300ms delay in iOS by performing a fake 'click',
+         * Using 'e.stopPropagation' to stop 'touchstart' event from 
+         * $toggle/$collapse will break global delegation.
+         * 
+         * Instead, we use a 'e.target' filter to prevent handler
+         * added to document close HuxNav.  
+         *
+         * Also, we use 'click' instead of 'touchstart' as compromise
+         */
+        document.addEventListener('click', function (e) {
+            if (e.target == $toggle) return;
+            if (e.target.className == 'icon-bar') return;
+            __HuxNav__.close();
+        })
+    </script>
+    <!-- Search -->
+<div class="search-page">
+  <div class="search-icon-close-container">
+    <span class="search-icon-close">
+      <i class="fa fa-chevron-down"></i>
+    </span>
+  </div>
+  <div class="search-main container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <form></form>
+        <input type="text" id="search-input" placeholder="$ grep...">
+        </form>
+        <div id="search-results" class="mini-post-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <!-- Image to hack wechat -->
+<!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="/img/post-bg-ios9-web.jpg" width="0" height="0"> -->
+
+<!-- Post Header -->
+
+
+
+<style type="text/css">
+    header.intro-header{
+        position: relative;
+        background-image: url('/img/post-bg-ios9-web.jpg');
+        background: ;
+    }
+
+    
+</style>
+
+<header class="intro-header" >
+
+    <div class="header-mask"></div>
+    
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                    </div>
+                    <h1>iOS 10.x 内存Crash 排查 纪要</h1>
+                    
+                    <h2 class="subheading">This is a subtitle</h2>
+                    <span class="meta">Posted by PaysonChen on September 13, 2021</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <!-- Multi-Lingual -->
+                
+
+				<p>更新日期：2021-09-07</p>
+
+<p>[TOC]</p>
+
+<h2 id="1基本情况">1、基本情况</h2>
+
+<p>​	最终堆栈位置：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre>XXX -[KSKitBaseModel encodeWithCoder:] (KSKitBaseModel.m:)
+XXX -[KSBaseModel encodeWithCoder:] (KSBaseModel.m:)
+XXX -[KSBaseModel encodeWithCoder:] (KSBaseModel.m:)
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<h2 id="2分析">2、分析</h2>
+
+<h3 id="21-堆栈分析">2.1 堆栈分析</h3>
+
+<p>跟踪多条Crash堆栈</p>
+
+<p>XXX堆栈 1：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="rouge-code"><pre>9 XXX 0x0000000103bf4718 -[KSKitBaseModel encodeWithCoder:] (KSKitBaseModel.m:42)
+11 XXX 0x0000000100721688 -[KSBaseModel encodeWithCoder:] (KSBaseModel.m:50)
+11 XXX 0x0000000100721688 -[KSBaseModel encodeWithCoder:] (KSBaseModel.m:50)
+21 XXX 0x00000001004434cc -[KSKVStorage writeObjectToFile:forKey:atomic:completion:] (KSKVStorage.m:0)
+22 XXX 0x000000010326f550 -[KSLocalConfigManager internalRemoveLocalConfig:isGolbal:] (KSLocalConfigManager.m:273)
+23 XXX 0x0000000103270330 +[KSLocalConfigManager removeLocalConfig:isGolbal:] (KSLocalConfigManager.m:0)
+24 XXX 0x000000010326fa64 +[KSLocalConfigManager dailyCommonValueConfig:isGolbal:] (KSLocalConfigManager.m:0)
+25 XXX 0x0000000100b55a30 -[KSKTVRoomViewController(InteractionGuide) checkIfShowGameOngoingView:] (KSKTVRoomViewController+InteractionGuide.m:0)
+26 XXX 0x0000000100b54d38 -[KSKTVRoomViewController(InteractionGuide) showGameOngoingViewWhenEnterKTV:] (KSKTVRoomViewController+InteractionGuide.m:192)
+37 XXX 0x00000001014ec7d4 main (main.m:37)
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>XXX堆栈2：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="rouge-code"><pre>9 XXX 0x0000000103b94718 -[KSKitBaseModel encodeWithCoder:] (KSKitBaseModel.m:42)
+11 XXX 0x00000001006c1688 -[KSBaseModel encodeWithCoder:] (KSBaseModel.m:50)
+11 XXX 0x00000001006c1688 -[KSBaseModel encodeWithCoder:] (KSBaseModel.m:50)
+21 XXX 0x00000001003e34cc -[KSKVStorage writeObjectToFile:forKey:atomic:completion:] (KSKVStorage.m:0)
+22 XXX 0x000000010320ee7c -[KSLocalConfigManager internalSaveLocalConfig:value:isGolbal:] (KSLocalConfigManager.m:220)
+23 XXX 0x000000010320fb10 +[KSLocalConfigManager saveLocalConfig:commonValue:isGolbal:] (KSLocalConfigManager.m:0)
+24 XXX 0x0000000102152b94 -[KSSendGiftContainerView tabView:didChangeSelectIndex:] (KSSendGiftContainerView.m:1952)
+25 XXX 0x000000010056235c -[KSTabView setSelectIndex:] (KSTabView.m:723)
+28 XXX 0x00000001009ccbc4 -[KSBaseButton sendAction:to:forEvent:] (KSBaseButton.m:0)
+46 XXX 0x000000010148c7d4 main (main.m:37)
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<h3 id="22-代码分析">2.2 代码分析</h3>
+
+<p>所有类型的堆栈最终都指向KSKVStorage writeObjectToFile,</p>
+
+<p>这是一个存储控制类，writeObjectToFile是将对象归档后写到磁盘</p>
+
+<p>最终堆栈指向</p>
+
+<pre><code class="language-objective-c">0 libsystem_kernel.dylib 0x000000018aa97014 ___pthread_kill + 8
+1 libsystem_c.dylib 0x000000018aa0b400 _abort + 140
+2 libsystem_malloc.dylib 0x000000018aadba5c _nano_free_definite_size + 92
+3 libsystem_malloc.dylib 0x000000018aadd028 _nano_realloc + 648
+4 libsystem_malloc.dylib 0x000000018aacf240 _malloc_zone_realloc + 180
+5 Foundation 0x000000018c5aa3e4 -[NSOperation isAsynchronous] + 180
+6 Foundation 0x000000018c53c2a0 __decodeInt64 + 452
+</code></pre>
+
+<p>可以认为是NSKeyedUnarchiver 与 NSKeyedArchiver 触发的对象  KSKitBaseModel 及 KSBaseModel 的 encodeWithCoder 方法，</p>
+
+<p>触发encodeWithCoder:方法为自动序列化的标准做法如下：</p>
+
+<pre><code class="language-objective-c">- (void)encodeWithCoder:(NSCoder *)encoder {
+	Class cls = [self class];
+	while (cls != [NSObject class]) {
+		unsigned int numberOfIvars = 0;
+		Ivar* ivars = class_copyIvarList(cls, &amp;numberOfIvars);
+		for(const Ivar* p = ivars; p &lt; ivars+numberOfIvars; p++)
+		{
+			Ivar const ivar = *p;
+			const char *type = ivar_getTypeEncoding(ivar);
+			NSString *key = [NSString stringWithUTF8String:ivar_getName(ivar)];
+            if (key == nil){
+                continue;
+            }
+            if ([key length] == 0){
+                continue;
+            }
+            
+			id value = [self valueForKey:key];
+			if (value) {
+				switch (type[0]) {
+					case _C_STRUCT_B: {
+						NSUInteger ivarSize = 0;
+						NSUInteger ivarAlignment = 0;
+						NSGetSizeAndAlignment(type, &amp;ivarSize, &amp;ivarAlignment);
+						NSData *data = [NSData dataWithBytes:(const char *)((__bridge void *)self) + ivar_getOffset(ivar)
+													  length:ivarSize];
+						[encoder encodeObject:data forKey:key];
+					}
+						break;
+					default:
+						[encoder encodeObject:value
+									   forKey:key];
+						break;
+				}
+			}
+		}
+		if (ivars) {
+			free(ivars);
+		}
+		
+		cls = class_getSuperclass(cls);
+	}
+}
+
+</code></pre>
+
+<p>上述方法通过 runtime机制 遍历当前类及其父类的属性，可以推断，在某个类或者某个继承关系中存在如下调用顺序时，触发了crash</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre>[KSKitBaseModel encodeWithCoder:] (KSKitBaseModel.m:42)
+[KSBaseModel encodeWithCoder:] (KSBaseModel.m:50)
+[KSBaseModel encodeWithCoder:] (KSBaseModel.m:50)
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>代码行数可能不准。</p>
+
+<p>根据断点调试，可能发生在 某个对象的 的归档中：</p>
+
+<h3 id="23-问题定位">2.3 问题定位</h3>
+
+<h4 id="231-堆栈定位">2.3.1 堆栈定位</h4>
+
+<p>​	再看堆栈，实现了自动序列化的KSBaseModel 及 KSKitBaseModel 作为全民K歌项目持久层对象的基类在自动序列化过程中发生crash：</p>
+
+<pre><code class="language-objective-c">0 libsystem_kernel.dylib 0x000000018aa97014 ___pthread_kill + 8
+1 libsystem_c.dylib 0x000000018aa0b400 _abort + 140
+2 libsystem_malloc.dylib 0x000000018aadba5c _nano_free_definite_size + 92
+3 libsystem_malloc.dylib 0x000000018aadd028 _nano_realloc + 648
+4 libsystem_malloc.dylib 0x000000018aacf240 _malloc_zone_realloc + 180
+5 Foundation 0x000000018c5aa3e4 -[NSOperation isAsynchronous] + 180
+6 Foundation 0x000000018c53c2a0 __decodeInt64 + 452
+7 XXX 0x0000000103cab808 -[KSKitBaseModel encodeWithCoder:] (KSKitBaseModel.m:42)
+8 Foundation 0x000000018c53c49c __decodeIntXXX+ 416
+9 XXX 0x00000001037a0b94 -[KSBaseModel encodeWithCoder:] (KSBaseModel.m:52)
+……
+</code></pre>
+
+<p>​	在分析了自动序列化代码未找到问题的情况下，看引发crash更直接的libsystem_malloc.dylib 通过对_nano_free_definite_size产生crash的调研发现bugly及微信团队在之前遇到过类似的情况：<a href="https://zhuanlan.zhihu.com/p/24342979">【腾讯Bugly干货分享】聊聊苹果的Bug - iOS 10 nano_free Crash</a></p>
+
+<h4 id="232-问题定位">2.3.2 问题定位</h4>
+
+<p>​	通过分析，发生crash机型都是iOS10的设备， 问题可以初步断定存在于iOS10的设备上i<strong>一类堆栈为nano_free字样的Crash</strong>，</p>
+
+<h3 id="24-复现">2.4 复现</h3>
+
+<h4 id="241-构建复现条件">2.4.1 构建复现条件</h4>
+
+<p>​	将全民K歌持久层代码简化后在新建工程中搭建复现环境。 模拟高频，高数据量持久化核心代码如下：</p>
+
+<pre><code class="language-objective-c">- (void)addOperation{
+    int count = 0;
+    while (count &lt; 10000) {
+        [self.lock lock];
+        //通过两台设备（iOS10 iPhone7P | iOS14 iPhone12）控制变量法模拟测试结论如下：
+        //iOS10设备的问题：
+        //通过修改 count % particle 中的 particle的值可以控制需要序列化的数组对象modelData的数据量，
+        //实践证明，当 particle 值越大， modelData的数据量 越大，越容易发生crash
+        //解决方案，控制每次序列化 数据量可以规避此crash
+        //非iOS10设备未出现此问题
+        NSString *key = [NSString stringWithFormat:@"%d",count];
+        int particle = 5;
+        if (count % particle == 1) {
+            if (self.modelDataDict.allKeys.count &gt; 0) {
+                [self.modelDataDict removeObjectForKey:[self.modelDataDict.allKeys objectAtIndex:0]];
+            }
+            
+        } else {
+            KSModel *model = [[KSModel alloc] init];
+            [self.modelDataDict setObject:model forKey:key];
+
+        }
+        [self.lock unlock];
+        count ++;
+
+        [self addopera:[self golbalSaveConfigKey] from:0 data:[self.modelDataDict mutableCopy]];
+
+        NSLog(@"done index:%d datalen = %lu", count, (unsigned long)self.modelDataDict.allKeys.count);
+    }
+    
+}
+
+- (void)addopera:(NSString *) key from:(int) type data:(id&lt;NSCoding, NSObject&gt;)obj{
+    
+    __block NSData *value = nil;
+    [_diskOperationQueue addOperationWithBlock:^{
+        NSMutableString *str = [NSMutableString new];
+        @try {
+            value = [NSKeyedArchiver archivedDataWithRootObject:obj];
+        }
+        @catch (NSException *exception) {
+            NSLog(@"exception = %@ ||  from = %d " ,exception ,type);
+        }
+        
+        NSString *filePath = [ViewController migrateFileNameForKey:[NSString stringWithFormat:@"%@_%@_a", str, key]];
+        NSError *error = nil;
+        [value writeToFile:filePath options:NSDataWritingAtomic error:&amp;error];
+    }];
+}
+
+
+</code></pre>
+
+<h4 id="242-控制设备变量对比">2.4.2 控制设备变量对比</h4>
+
+<p>​	通过控制设备以不同iOS版本号的设备进行测试，在iOS10 iPhone7P上跑上述代码 发生了Crash，Crash堆栈位置吻合：</p>
+
+<p><img src="img/2021-09-13crash/Crash.png" alt="" /></p>
+
+<p>在iOS14 iPhone12 未出现此crash</p>
+
+<h4 id="243-控制数据量对比">2.4.3 控制数据量对比</h4>
+
+<p>​	通过改变上述 particle 的值为 2 时，iOS10的设备不会发生crash,可以证明在所需序列化数据量较小时（至少说明在长度小于等于2的情况）不会发生crash，运行日志表明循环10000次序列化的情况：</p>
+
+<pre><code class="language-objective-c">2021-09-07 21:22:25.626353 PT-2[1187:35082] done index:9995 datalen = 2
+2021-09-07 21:22:25.626385 PT-2[1187:35082] done index:9996 datalen = 1
+2021-09-07 21:22:25.626456 PT-2[1187:35082] done index:9997 datalen = 2
+2021-09-07 21:22:25.626520 PT-2[1187:35082] done index:9998 datalen = 1
+2021-09-07 21:22:25.626584 PT-2[1187:35082] done index:9999 datalen = 2
+2021-09-07 21:22:25.626610 PT-2[1187:35082] done index:10000 datalen = 1
+</code></pre>
+
+<p>​	而当particle超过一定数值及循环次数达到一定次数（也就是所需序列化的数组长度足够长时）就会发生crash，通过日志查看，当前复现条件数组长度达到5000左右时发生crash，与在全民K歌项目中的环境不同，可能这个长度会有差异：</p>
+
+<pre><code class="language-objective-c">2021-09-07 21:14:15.166295 PT-2[1087:32256] done index:8773 datalen = 5264
+PT-2(1087,0x16dfe3000) malloc: *** error for object 0x173050000: Freeing unallocated pointer
+*** set a breakpoint in malloc_error_break to debug
+*** error for object 0x173050000: Freeing unallocated pointer
+</code></pre>
+
+<p>上述日志发生crash的条件：</p>
+
+<p>循环次数为：8773</p>
+
+<p>所需序列化数组数据长度为：5264</p>
+
+<h3 id="25-解决方案">2.5 解决方案</h3>
+
+<p>​	通过上述调研与实践，问题发生在特定设备及特定条件下：</p>
+
+<p>特定设备：iOS10.x</p>
+
+<p>​	特定设备无法避免。</p>
+
+<p>特定条件：序列化数据量大</p>
+
+<p>​	通过全民K歌持久层代码走读，发现发生增删时，都要重新序列化全量的数据。由于上述复现条件的【控制数据量对比】</p>
+
+<p>通过优化增量数据的序列化方案可以使得序列化数据量较小，从而规避此crash。</p>
+
+<p>方案一：CoreData替代NSKeyedArchiver持久化方案</p>
+
+<p>方案二：优化NSKeyedArchiver的数据量，每次只持久化增量数据，持久化不再通过NSMutableDictionary setObject之后再持久化，而是直接将需要持久化的对象加Key进行持久化:</p>
+
+<pre><code class="language-objective-c">- (void)addOperation{
+    int count = 0;
+    while (count &lt; 10000) {
+        [self.lock lock];
+        NSString *key = [NSString stringWithFormat:@"%d",count];
+				KSModel *model = [[KSModel alloc] init];
+        [self addopera:[self golbalSaveConfigKeyWithKey:key] from:0 data:model];
+        [self.lock unlock];
+        count ++;
+        NSLog(@"done index:%d datalen = %lu", count, (unsigned long)self.modelDataDict.allKeys.count);
+    }
+}
+
+
+</code></pre>
+
+<p>上述方案每次序列化只有一个元素，经验证在iOS10.X 10000次循环不会发生crash，但此方法牺牲了遍历的方便性，需要在反序列化时通过Key值从不同的存储文件中获取后再进行：</p>
+
+<pre><code class="language-objective-c">        id obj = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+</code></pre>
+
+<p>补充：也需确保序列化对象属性数据量不宜过大</p>
+
+<h2 id="3其他">3、其他</h2>
+
+<h3 id="31-风险">3.1 风险</h3>
+
+<p>此外，CRASH方法中存在API废弃风险</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>value = [NSKeyedArchiver archivedDataWithRootObject:obj];'archivedDataWithRootObject:' is deprecated: first deprecated in iOS 12.0 - Use +archivedDataWithRootObject:requiringSecureCoding:error: instead
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p> </p>
+
+
+
+                <hr style="visibility: hidden;">
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2021/06/20/new-post/" data-toggle="tooltip" data-placement="top" title="Jenkins迁移">
+                        Previous<br>
+                        <span>Jenkins迁移</span>
+                        </a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="/2021/10/18/git/" data-toggle="tooltip" data-placement="top" title="多账号配置GIT">
+                        Next<br>
+                        <span>多账号配置GIT</span>
+                        </a>
+                    </li>
+                    
+                </ul>
+                <hr style="visibility: hidden;">
+
+                
+                <!-- disqus 评论框 start -->
+                <div class="comment">
+                    <div id="disqus_thread" class="disqus-thread"></div>
+                </div>
+                <!-- disqus 评论框 end -->
+                
+
+                
+            </div>  
+
+    <!-- Side Catalog Container -->
+        
+            <div class="
+                col-lg-2 col-lg-offset-0
+                visible-lg-block
+                sidebar-container
+                catalog-container">
+                <div class="side-catalog">
+                    <hr class="hidden-sm hidden-xs">
+                    <h5>
+                        <a class="catalog-toggle" href="#">CATALOG</a>
+                    </h5>
+                    <ul class="catalog-body"></ul>
+                </div>
+            </div>
+        
+
+    <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+
+
+<section>
+    
+        <hr class="hidden-sm hidden-xs">
+    
+    <h5><a href="/archive/">FEATURED TAGS</a></h5>
+    <div class="tags">
+        
+        
+        
+        
+        
+    </div>
+</section>
+
+
+                <!-- Friends Blog -->
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+<!-- add support for mathjax by voleking-->
+
+
+
+
+
+
+<!-- disqus 公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = "Cyp";
+    var disqus_identifier = "/2021/09/13/crash";
+    var disqus_url = "http://localhost:4000/2021/09/13/crash/";
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<!-- disqus 公共JS代码 end -->
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'right',
+          // icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <!-- SNS Link -->
+                
+
+
+<ul class="list-inline text-center">
+
+
+  
+  
+  
+  
+  
+  
+  
+</ul>
+
+                <p class="copyright text-muted">
+                    Copyright &copy; PaysonChen Blog 2024
+                    <br>
+                    <!-- Powered by <a href="http://huangxuan.me">Hux Blog</a> | -->
+                 <!--    <iframe style="margin-left: 2px; margin-bottom:-5px;" frameborder="0" scrolling="0" width="100px"
+                        height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=huxpro&repo=huxpro.github.io&type=star&count=true">
+                    </iframe> -->
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js "></script>
+
+<!-- Bootstrap Core JavaScript -->
+<!-- Currently, only navbar scroll-down effect at desktop still depends on this -->
+<script src="/js/bootstrap.min.js "></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js "></script>
+
+<!-- Simple Jekyll Search -->
+<script src="/js/simple-jekyll-search.min.js"></script>
+
+<!-- Service Worker -->
+
+<script src="/js/snackbar.js "></script>
+<script src="/js/sw-registration.js "></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+        var d = document, t = 'script',
+            o = d.createElement(t),
+            s = d.getElementsByTagName(t)[0];
+        o.src = u;
+        if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+        s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!--
+     Because of the native support for backtick-style fenced code blocks
+     right within the Markdown is landed in Github Pages,
+     From V1.6, There is no need for Highlight.js,
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/
+     - https://github.com/jneen/rouge/wiki/list-of-supported-languages-and-lexers
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+
+
+
+
+
+<!--fastClick.js -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js", function () {
+        var $nav = document.querySelector("nav");
+        if ($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+
+<!-- Baidu Tongji -->
+
+
+
+<!-- Side Catalog -->
+
+<script type="text/javascript">
+    function generateCatalog(selector) {
+
+        // interop with multilangual 
+        if ('' == 'true') {
+            _containerSelector = 'div.post-container.active'
+        } else {
+            _containerSelector = 'div.post-container'
+        }
+
+        // init
+        var P = $(_containerSelector), a, n, t, l, i, c;
+        a = P.find('h1,h2,h3,h4,h5,h6');
+
+        // clean
+        $(selector).html('')
+
+        // appending
+        a.each(function () {
+            n = $(this).prop('tagName').toLowerCase();
+            i = "#" + $(this).prop('id');
+            t = $(this).text();
+            c = $('<a href="' + i + '" rel="nofollow">' + t + '</a>');
+            l = $('<li class="' + n + '_nav"></li>').append(c);
+            $(selector).append(l);
+        });
+        return true;
+    }
+
+    generateCatalog(".catalog-body");
+
+    // toggle side catalog
+    $(".catalog-toggle").click((function (e) {
+        e.preventDefault();
+        $('.side-catalog').toggleClass("fold")
+    }))
+
+    /*
+     * Doc: https://github.com/davist11/jQuery-One-Page-Nav
+     * Fork by Hux to support padding
+     */
+    async("/js/jquery.nav.js", function () {
+        $('.catalog-body').onePageNav({
+            currentClass: "active",
+            changeHash: !1,
+            easing: "swing",
+            filter: "",
+            scrollSpeed: 700,
+            scrollOffset: 0,
+            scrollThreshold: .2,
+            begin: null,
+            end: null,
+            scrollChange: null,
+            padding: 80
+        });
+    });
+</script>
+
+
+
+<!-- Multi-Lingual -->
+
+
+<!-- Simple Jekyll Search -->
+<script>
+    // https://stackoverflow.com/questions/1912501/unescape-html-entities-in-javascript
+    function htmlDecode(input) {
+        var e = document.createElement('textarea');
+        e.innerHTML = input;
+        // handle case of empty input
+        return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
+    }
+
+    SimpleJekyllSearch({
+        searchInput: document.getElementById('search-input'),
+        resultsContainer: document.getElementById('search-results'),
+        json: '/search.json',
+        searchResultTemplate: '<div class="post-preview item"><a href="{url}"><h2 class="post-title">{title}</h2><h3 class="post-subtitle">{subtitle}</h3><hr></a></div>',
+        noResultsText: 'No results',
+        limit: 50,
+        fuzzy: false,
+        // a hack to get escaped subtitle unescaped. for some reason, 
+        // post.subtitle w/o escape filter nuke entire search.
+        templateMiddleware: function (prop, value, template) {
+            if (prop === 'subtitle' || prop === 'title') {
+                if (value.indexOf("code")) {
+                    return htmlDecode(value);
+                } else {
+                    return value;
+                }
+            }
+        }
+    });
+
+    $(document).ready(function () {
+        var $searchPage = $('.search-page');
+        var $searchOpen = $('.search-icon');
+        var $searchClose = $('.search-icon-close');
+        var $searchInput = $('#search-input');
+        var $body = $('body');
+
+        $searchOpen.on('click', function (e) {
+            e.preventDefault();
+            $searchPage.toggleClass('search-active');
+            var prevClasses = $body.attr('class') || '';
+            setTimeout(function () {
+                $body.addClass('no-scroll');
+            }, 400)
+
+            if ($searchPage.hasClass('search-active')) {
+                $searchClose.on('click', function (e) {
+                    e.preventDefault();
+                    $searchPage.removeClass('search-active');
+                    $body.attr('class', prevClasses);  // from closure 
+                });
+                $searchInput.focus();
+            }
+        });
+    });
+</script>
+
+
+<!-- Image to hack wechat -->
+<img src="/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>
