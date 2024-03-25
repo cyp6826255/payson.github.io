@@ -1,11 +1,11 @@
 ---
 layout: post
 title: "问题解决：Xcode15无法创建Category"
-subtitle: "This is a subtitle"
+subtitle: "Xcode bug修复"
 date: 2024-03-25
 author: "PaysonChen"
 header-img: "img/post-bg-2015.jpg"
-tags: []
+tags: [Xcode]
 ---
 
 ## 1、背景

@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "iOS组件化话外篇：Podfile 工程配置"
-subtitle: "This is a subtitle"
+subtitle: "cocoaPods"
 date: 2024-03-06
 author: "PaysonChen"
 header-img: "img/post-bg-2015.jpg"
