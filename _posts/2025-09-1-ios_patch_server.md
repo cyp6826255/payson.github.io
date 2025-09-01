@@ -127,6 +127,33 @@ echo "PATCH PATH: $patch_path"
 - ​	版本号校验，避免非必要下载
 
 ```js
+// index.js
+const express = require("express");
+const path = require("path");
+const fs = require("fs");
+const crypto = require("crypto");
+const vc = require("./verisonCompare");
+
+const app = express();
+const PORT = 3001;
+
+// 支持 JSON 请求体
+app.use(express.json());
+
+// 静态文件目录
+app.use(express.static(path.join(__dirname, "public")));
+
+// ---- 配置 ----
+const PATCH_DIR = path.join(__dirname, "patch"); // 补丁文件存放目录
+const CURRENT_VERSION = "1.1.1"; // 当前最新版本
+const TEMP_LINK_EXPIRE = 60 * 1000; // 临时链接有效时间：1分钟
+const tempLinks = new Map(); // 存储临时下载链接
+
+app.get('/api/endpoint', (req, res) => {
+    res.json({ foo: 'bar' });
+});
+
+// ---- 接口：检查版本 ----
 app.post("/api/patch/version", (req, res) => {
   const { version, md5 } = req.body;
 
@@ -135,9 +162,13 @@ app.post("/api/patch/version", (req, res) => {
   }
 
 
-  if (version === CURRENT_VERSION) {
-    return res.json({ update: false });
+  // 检查版本 版本号不高于当前版本都支持更新
+  // 也可以设置 版本号相等才更新 那就是 == 0
+  if (vc(version, CURRENT_VERSION) > 0) {
+    return res.status(400).json({ error: "Invalid version" });
   }
+
+
 
   // 需要更新
   const patchFile = path.join(PATCH_DIR, "patch");
@@ -166,6 +197,32 @@ app.post("/api/patch/version", (req, res) => {
     version: CURRENT_VERSION,
     url: `/api/patch/download/${token}`
   });
+});
+
+// ---- 下载接口：临时链接 ----
+app.get("/api/patch/download/:token", (req, res) => {
+  const { token } = req.params;
+  const link = tempLinks.get(token);
+
+  if (!link) {
+    return res.status(404).send("Invalid or expired link");
+  }
+
+  if (Date.now() > link.expire) {
+    tempLinks.delete(token);
+    return res.status(403).send("Link expired");
+  }
+
+  // 设置下载头
+  res.download(link.path, "patch.zip", (err) => {
+    // 下载完成后可删除临时链接
+    tempLinks.delete(token);
+  });
+});
+
+// ---- 启动服务器 ----
+app.listen(PORT, () => {
+  console.log(`文件服务器已启动：http://localhost:${PORT}`);
 });
 
 ```
