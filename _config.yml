@@ -136,3 +136,11 @@ mermaid:
 #         href: "http://huangxuan.me/"
 #     }
 # ]
+
+collections:
+  en_posts:
+    output: true
+    permalink: /en/:title/
+  zh_posts:
+    output: true
+    permalink: /zh/:title/

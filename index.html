@@ -3,7 +3,8 @@ layout: page
 description: "「认识自己，接纳自己；改变自己；超越自己」"
 ---
 
-{% for post in paginator.posts %}
+{% assign zh_posts = site.zh_posts % | sort: "date" | reverse %}
+{% for post in zh_posts %}
 <div class="post-preview">
     <a href="{{ post.url | prepend: site.baseurl }}">
         <h2 class="post-title">
@@ -15,11 +16,7 @@ description: "「认识自己，接纳自己；改变自己；超越自己」"
         </h3>
         {% endif %}
         <div class="post-content-preview">
-            {% if post.lang == 'en' %}
-                {{ post.content | strip_html | truncate:300 }}
-            {% else %}
-                {{ post.content | strip_html | truncate:200 }}
-            {% endif %}
+            {{ post.content | strip_html | truncate:300 }}
         </div>
     </a>
     <p class="post-meta">

@@ -233,8 +233,449 @@
                 postlist-container
             ">
     			
+
 <div class="post-preview">
-    <a href="/2024/01/08/ios/">
+    <a href="/zh/ios_patch_server/">
+        <h2 class="post-title">
+            移动端热更新方案之服务端逻辑
+        </h2>
+        
+        <h3 class="post-subtitle">
+            HotFix
+        </h3>
+        
+        <div class="post-content-preview">
+            1、背景
+
+​	在客户端具备应用Patch功能后，需要有一个可靠的服务端来分发生产环境的Patch，以实现高效、安全的补丁推送。以下是服务端Patch分发能力的核心模块与实现逻辑。
+
+2、技术方案
+
+2.1、Patch生成技术方案
+
+2.1.1、生成Patch
+
+通过OCRunner自带的PatchGenerator工具，可以对需要修改的类进行Patch编译：
+
+1
+./PatchGenerator -files TestCrash.m -refs Scripts.bundle -output binarypatch
+
+
+2.1.2、Git差异化编译
+
+为保证后续Patch生成的流程规范...
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by PaysonChen on September 1, 2025
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/zh/ios_hybrid_containner/">
+        <h2 class="post-title">
+            基于iOS端自生成跨平台App容器的实践
+        </h2>
+        
+        <h3 class="post-subtitle">
+            App跨平台容器化
+        </h3>
+        
+        <div class="post-content-preview">
+            一、前言
+
+在搬运前端App（h5、小程序）等，到App的过程中，原生无需实现具体的业务行为，更多的是提供基础能力。因此提供一个容器化的壳工程的过程变得重复、但同时也可程序化。
+
+二、App新建过程
+
+这里简单介绍一款iOS的App的新建过程（仅限我的视角，不足之处欢迎指出），以下简单介绍一些主要步骤
+
+1、新建iOS App工程
+
+2、基础设置（设置包名、显示名称、最低版本、组织设置、URL Scheme等）
+
+3、配置Podfile
+
+4、配置icon、启动图等图片资源
+
+5、证书配置（Apple Developer 新建bundle ID、Provision等）
+
+6、构建流水线配...
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by PaysonChen on July 28, 2025
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/zh/ios_patch/">
+        <h2 class="post-title">
+            iOS 热更新方案简析
+        </h2>
+        
+        <h3 class="post-subtitle">
+            HotFix
+        </h3>
+        
+        <div class="post-content-preview">
+            1、背景
+
+​	原生代码不像前端，可以无感更新，当线上出现致命问题时，如果没有做ABTest或者其他远程配置，往往需要通过发版才能解决，而原生发版需要经过应该市场审核，往往流程长（一般需要12小时，甚至24小时以上）。
+
+2、技术方案
+
+​	JSPatch方案被AppStore拒了，只能转向寻求二进制化的热更新方案
+
+​	OCRunner,通过编译二进制补丁，理论上是可以通过AppStore审核（待后续尝试一下）
+
+3、实践步骤
+
+​	OCRunner
+
+1
+git clone --recursive https://github.com/SilverFruity/OCRunner.gi...
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by PaysonChen on July 25, 2025
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/zh/ios/">
+        <h2 class="post-title">
+            iOS网络监听：大陆国行与非大陆国行区别
+        </h2>
+        
+        <h3 class="post-subtitle">
+            网络监听
+        </h3>
+        
+        <div class="post-content-preview">
+            1、背景
+
+首次安装应用，存在需要点击“允许xxx使用无线数据”的弹窗，点击允许后才有网络权限。
+
+
+
+一些首次配置的联网操作需要此弹窗后进行，于是我们需要进行网络监听：
+
+/// 开始监听
+- (void)startMonitoringWithCallback:(void (^)(PSCAppNetworkStatus status))callback {
+    if (!callback) return;
+
+    nw_path_monitor_set_update_handler(_monitor, ^(nw_path_t path) {
+        PSCAppNetwo...
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by PaysonChen on June 6, 2025
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/zh/ios/">
+        <h2 class="post-title">
+            iOS自动化调试：自动编译启动
+        </h2>
+        
+        <h3 class="post-subtitle">
+            自动化
+        </h3>
+        
+        <div class="post-content-preview">
+            iOS自动化调试：自动编译启动
+
+最近发现了一个莫名其他的BBUG，程序已启动就出现了一个崩溃，崩溃堆栈让人摸不着头脑：
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+0 libobjc.A.dylib		_cache_getImp + 8
+1 libobjc.A.dylib		_object_getMethodImplementation + 212
+2 CoreFoundation		__NSIsNSString + 136
+3 CoreFoundation		-[NSTaggedPointerString isEqual:] + 176
+4 CoreFo...
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by PaysonChen on April 22, 2024
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/zh/iosios/">
+        <h2 class="post-title">
+            iOS构建：自动配置iOS证书
+        </h2>
+        
+        <h3 class="post-subtitle">
+            证书自动化部署
+        </h3>
+        
+        <div class="post-content-preview">
+            1、背景
+
+Apple开发证书存在一年一度过期的情况，证书的不匹配，或者新环境下的流水线、以及后续可能存在的集群化构建，可能需要手动配置证书后才能正常执行构建任务
+
+2、方案
+
+为了使构建流水线不需要跟随每年的证书更新而需要人工维护，期望在构建时能新增证书部署环节。为了兼容各种不同流水线，这里就用简单的shell脚本实现
+
+2.1 证书获取及更新
+
+2.1.1 证书的分类
+
+
+  ​	p12
+  ​	Cer
+  ​	mobileprovision
+
+
+2.1.2 创建证书Git仓库
+
+​	在Apple开发者管理后台申请证书并提交到一个git仓库可以做如下结构的安排
+
+1
+2
+3
+4
+5
+...
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by PaysonChen on March 26, 2024
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/zh/xcode15category/">
+        <h2 class="post-title">
+            问题解决：Xcode15无法创建Category
+        </h2>
+        
+        <h3 class="post-subtitle">
+            Xcode bug修复
+        </h3>
+        
+        <div class="post-content-preview">
+            1、背景
+
+升级了xcode之后，发现创建category文件失败
+
+2、解决
+
+通过查找资料，发现xcode15 缺乏两组文件：
+
+
+  
+    CategoryNSObject
+
+    路径如下：
+  
+
+
+1
+vi /Applications/Xcode.app/Contents/Developer/Library/Xcode/Templates/File\ Templates/MultiPlatform/Source/Objective-C\ File.xctemplate/CategoryNSObject/___VARIABLE_extendedClass/identifi...
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by PaysonChen on March 25, 2024
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/zh/x/">
+        <h2 class="post-title">
+            iOS组件化：工具篇  specific_install 安装使用遇到的问题
+        </h2>
+        
+        <h3 class="post-subtitle">
+            gem工具篇
+        </h3>
+        
+        <div class="post-content-preview">
+            1、specific_install简介
+
+​	rubygems plugin that allows you you to install a gem from from its github repository (like ‘edge’), or from an arbitrary URL
+
+2、安装
+
+一般而言，specific_install的安装直接从rubygem的源上安装就行
+
+1
+$ gem install specific_install
+
+
+当有权限问题时使用：
+
+1
+$ sudo gem install specific_install
+
+
+然而在此安装的是发布到...
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by PaysonChen on March 25, 2024
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/zh/ios/">
+        <h2 class="post-title">
+            iOS话外篇：分发详解
+        </h2>
+        
+        <h3 class="post-subtitle">
+            分发
+        </h3>
+        
+        <div class="post-content-preview">
+            1.背景
+
+在没有良好的移动端CI/CD（比如腾讯蓝盾）背景下，需要先通过自行寻找分发方案，当前使用蒲公英应用内侧分发平台进行分发，由于免费版存在使用限制，比如对版本号数量限制、以及存储大小限制等。后续考虑部署较为友好的CICD服务来解决此问题。
+
+2.构建证书详解
+
+4种构建方式解析：
+
+
+  App Store : 用来发布到App Store， 使用发布证书编译。
+    
+      证书类型：production
+      exportOptionsPlist method：app-store
+      signingCertificate：Apple Distributi...
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by PaysonChen on March 25, 2024
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/zh/iospodfile/">
+        <h2 class="post-title">
+            iOS组件化话外篇：Podfile 工程配置
+        </h2>
+        
+        <h3 class="post-subtitle">
+            cocoaPods
+        </h3>
+        
+        <div class="post-content-preview">
+            1、cocopaods生成 组织信息
+
+​	模板修改
+
+​	podfile新增：
+
+1
+2
+3
+post_install do |installer|
+    installer.pods_project.root_object.attributes["ORGANIZATIONNAME"] = "YOUR ORGANIZATIONNAME"
+end
+
+
+在执行
+
+1
+pod install
+
+
+之后，工程项目的“ORGANIZATIONNAME”的字段自动填充你所要的值：
+
+
+
+2、主工程签名
+
+1
+2
+3
+4
+5
+6
+7
+post_install do |installer|
+  in...
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by PaysonChen on March 6, 2024
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/zh/mac/">
+        <h2 class="post-title">
+            Mac常规配置备忘
+        </h2>
+        
+        <h3 class="post-subtitle">
+            一些常用工具与环境配置备忘
+        </h3>
+        
+        <div class="post-content-preview">
+            Mac常规配置备忘
+
+1 准备
+
+1、设置键盘修饰键，command &lt;—&gt;option （个人偏好）
+
+2、鼠标 =&gt; 自然滚动方式关闭（个人偏好）
+
+3、显示隐藏文件
+
+1
+2
+3
+ defaults write com.apple.finder AppleShowAllFiles -bool true
+
+ killall Finder
+
+
+2 App安装
+
+1、chrome（https://google.com/chrome/）
+
+2、sourceTree（https://www.sourcetreeapp.com/）
+
+3、搜狗输入法（https://shuru...
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by PaysonChen on January 19, 2024
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/zh/ios/">
         <h2 class="post-title">
             iOS组件化实现之：实用工具沉淀及介绍
         </h2>
@@ -244,8 +685,7 @@
         </h3>
         
         <div class="post-content-preview">
-            
-                1.背景
+            1.背景
 
 ​	组件化过程中，有一些重复/高频的问题需要解决，倘若手动解决会带来重复劳动的时间损失，以及没有沉淀的效率损失，为了避免上述损失，沉淀一些工具分享。
 
@@ -284,8 +724,40 @@
 29
 30
 31
-3...
-            
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65...
         </div>
     </a>
     <p class="post-meta">
@@ -295,7 +767,7 @@
 <hr>
 
 <div class="post-preview">
-    <a href="/2023/11/08/%E6%9E%84%E5%BB%BA%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%AE%9E%E8%B7%B5/">
+    <a href="/zh/%E6%9E%84%E5%BB%BA%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%AE%9E%E8%B7%B5/">
         <h2 class="post-title">
             构建流水线实践
         </h2>
@@ -305,8 +777,7 @@
         </h3>
         
         <div class="post-content-preview">
-            
-                1 背景
+            1 背景
 
 ​	为了适应不通项目的自动化的需求，而且构建的方式和能力也在不断的迭代与演进，同时维护多个构建脚本存在成本与遗漏，因此将打包脚本的通用能力抽离，通过配置参数进行不同项目的构建。
 
@@ -325,8 +796,12 @@
 # [目的]
 # 为了使流水线建设趋于可维护，易维护，可迁移，易迁移，对构建逻辑进行模块化、将构建主流程划分为：构建前、构建、构建后，三大模块
 #
-...
-            
+#   构建前：参数配置、版本号设置
+#   构建中：Pod install、xcbuild
+#   构建后：归档、分发、通知
+#
+# 当前的构建后方案的选择：
+#   归档：简单云（ipa+dSYM...
         </div>
     </a>
     <p class="post-meta">
@@ -336,7 +811,7 @@
 <hr>
 
 <div class="post-preview">
-    <a href="/2023/10/07/%E6%8A%93%E5%8C%85%E5%AE%9E%E8%B7%B5/">
+    <a href="/zh/%E6%8A%93%E5%8C%85%E5%AE%9E%E8%B7%B5/">
         <h2 class="post-title">
             Charles HTTPS实践
         </h2>
@@ -346,8 +821,7 @@
         </h3>
         
         <div class="post-content-preview">
-            
-                Charles HTTPS 实践
+            Charles HTTPS 实践
 
 1、背景
 
@@ -355,8 +829,19 @@
 
 2、方案选择
 
-咨询之前做过类似工作的测试团队，无法给到比较可靠的方案，一开始选择逆向方案，通过移动端组内评估，以及咨询业内的安全工程师，逆向方案 ，代价较高，且暂无这方面的能力储备，...
-            
+咨询之前做过类似工作的测试团队，无法给到比较可靠的方案，一开始选择逆向方案，通过移动端组内评估，以及咨询业内的安全工程师，逆向方案 ，代价较高，且暂无这方面的能力储备，风险不可控。
+
+于是我们认为可以尝试抓包某地图App的方式，验证可行性
+
+3、抓包
+
+wireshark上抓包无法（难度较高）解析https协议
+
+采用Charles 抓包：
+
+3.1、代理搭建
+
+打...
         </div>
     </a>
     <p class="post-meta">
@@ -366,7 +851,7 @@
 <hr>
 
 <div class="post-preview">
-    <a href="/2023/10/07/%E7%BB%84%E4%BB%B6%E5%8C%96%E4%B9%8B%E5%88%86%E6%94%AF%E5%90%88%E5%B9%B6/">
+    <a href="/zh/%E7%BB%84%E4%BB%B6%E5%8C%96%E4%B9%8B%E5%88%86%E6%94%AF%E5%90%88%E5%B9%B6/">
         <h2 class="post-title">
             组件化实践之：主工程抽离代码分支合并用
         </h2>
@@ -376,8 +861,7 @@
         </h3>
         
         <div class="post-content-preview">
-            
-                组件化实践之：主工程抽离代码分支合并
+            组件化实践之：主工程抽离代码分支合并
 
 1 背景
 
@@ -389,8 +873,11 @@
 
 ​	合并主干（其他分支）代码时,主干（其他分支）有对移动之前的类做修改的情况下,会导致合并冲突,
 
-...
-            
+​	这种冲突是整个类都是新增符号(+),没有冲突符号，此时无法简单的通过工具，或者冲突的符号对其进行解冲突。
+
+2 问题处理
+
+​	解决上述冲突,最开始想到的方案是通过xcode自带filemerge...
         </div>
     </a>
     <p class="post-meta">
@@ -400,7 +887,7 @@
 <hr>
 
 <div class="post-preview">
-    <a href="/2023/09/12/iOS-OC-Swift%E6%B7%B7%E7%BC%96/">
+    <a href="/zh/iOS-OC-Swift%E6%B7%B7%E7%BC%96/">
         <h2 class="post-title">
             Pod仓库内OC与Swift调用
         </h2>
@@ -410,8 +897,7 @@
         </h3>
         
         <div class="post-content-preview">
-            
-                Pod仓库内OC与Swift调用
+            Pod仓库内OC与Swift调用
 
 1、Pod内OC调Swift
 
@@ -434,8 +920,16 @@ Pod内Swift类的声明需加上
 import Foundation
 
 @objcMembers open class SwiftBridge : UIViewController {
-    open override func vie...
-            
+    open override func viewDidLoad() {
+        self.view.backgroundColor = UIColor.red        
+    }
+}
+
+
+
+在需要使用的类上 import
+
+  #...
         </div>
     </a>
     <p class="post-meta">
@@ -445,7 +939,7 @@ import Foundation
 <hr>
 
 <div class="post-preview">
-    <a href="/2023/08/17/iOS%E7%BB%84%E4%BB%B6%E5%8C%96-%E4%B8%9A%E5%8A%A1%E7%BB%84%E4%BB%B6%E5%87%86%E5%A4%87%E7%AF%87/">
+    <a href="/zh/iOS%E7%BB%84%E4%BB%B6%E5%8C%96-%E4%B8%9A%E5%8A%A1%E7%BB%84%E4%BB%B6%E5%87%86%E5%A4%87%E7%AF%87/">
         <h2 class="post-title">
             iOS组件化之：业务组件准备篇
         </h2>
@@ -455,8 +949,7 @@ import Foundation
         </h3>
         
         <div class="post-content-preview">
-            
-                iOS组件化之：业务组件准备篇
+            iOS组件化之：业务组件准备篇
 
 1. 背景
 
@@ -470,8 +963,16 @@ import Foundation
   
   ​	非冗余但未被使用的文件
     
-      未在其他类...
-            
+      未在其他类中使用到的类文件
+    
+  
+
+
+为了减轻业务组件的工作量和复杂度，在此之前最好能净化/清理一下工程
+
+具体采用人工 or 脚本 进行清理：
+
+根据我们进行估算，执行的时间复杂度为 n²，如果主工...
         </div>
     </a>
     <p class="post-meta">
@@ -481,7 +982,7 @@ import Foundation
 <hr>
 
 <div class="post-preview">
-    <a href="/2023/08/11/Apple%E4%BC%81%E4%B8%9A%E8%B4%A6%E5%8F%B7%E6%B3%A8%E5%86%8C%E6%B5%81%E7%A8%8B/">
+    <a href="/zh/Apple%E4%BC%81%E4%B8%9A%E8%B4%A6%E5%8F%B7%E6%B3%A8%E5%86%8C%E6%B5%81%E7%A8%8B/">
         <h2 class="post-title">
             Apple 企业账号注册流程
         </h2>
@@ -491,8 +992,7 @@ import Foundation
         </h3>
         
         <div class="post-content-preview">
-            
-                Apple 企业账号注册流程
+            Apple 企业账号注册流程
 
 1、准备AppleID
 
@@ -506,8 +1006,7 @@ import Foundation
 
 ​	注册时需要填入【个人】实名信息，非公司信息。
 
-​	如果这个时候，地址校...
-            
+​	如果这个时候，地址校验多次失败之后，注册按钮会一直置灰，这个时候就需要通过电话联系Apple开发者，根据当下的异常进行处理，我的经验是：后台解除了我的限制之后，我又输入了公司的信息，导致再次错误，而二次错误无法继续解除，...
         </div>
     </a>
     <p class="post-meta">
@@ -517,7 +1016,7 @@ import Foundation
 <hr>
 
 <div class="post-preview">
-    <a href="/2023/08/08/iOS-%E8%AF%9D%E5%A4%96%E7%AF%87-%E6%9E%84%E5%BB%BA%E8%AF%A6%E8%A7%A3/">
+    <a href="/zh/iOS-%E8%AF%9D%E5%A4%96%E7%AF%87-%E6%9E%84%E5%BB%BA%E8%AF%A6%E8%A7%A3/">
         <h2 class="post-title">
             iOS话外篇：构建详解
         </h2>
@@ -527,8 +1026,7 @@ import Foundation
         </h3>
         
         <div class="post-content-preview">
-            
-                iOS话外篇：构建详解
+            iOS话外篇：构建详解
 
 1.背景
 
@@ -538,8 +1036,15 @@ import Foundation
   步骤多
 
 
-​		打包前需要同步代码、打包过程中需要选择签名、打包后要归档、并选择上传包的地方（分发...
-            
+​		打包前需要同步代码、打包过程中需要选择签名、打包后要归档、并选择上传包的地方（分发渠道orAppStore）
+
+
+  时间长
+
+
+​		构建时间随着工程迭代越来越漫长，大型全量打包可能到数十分钟，archive会阻断当前研发进程，无法利用本机算力之外的其他计算集群资源，影响研效
+
+...
         </div>
     </a>
     <p class="post-meta">
@@ -549,7 +1054,7 @@ import Foundation
 <hr>
 
 <div class="post-preview">
-    <a href="/2023/08/03/iOS-%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%9C%A8%E5%86%85%E7%BD%91%E8%81%94%E8%B0%83%E6%97%B6%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/">
+    <a href="/zh/iOS-%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%9C%A8%E5%86%85%E7%BD%91%E8%81%94%E8%B0%83%E6%97%B6%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/">
         <h2 class="post-title">
             iOS客户端在内网联调时的解决方案
         </h2>
@@ -559,8 +1064,7 @@ import Foundation
         </h3>
         
         <div class="post-content-preview">
-            
-                iOS客户端在内网联调时的解决方案
+            iOS客户端在内网联调时的解决方案
 
 1.背景
 
@@ -583,8 +1087,14 @@ import Foundation
 
 3.解决方案：
 
-...
-            
+3.1 方案1：测试机
+
+通过iPhone的快捷指令实现自动化：
+
+
+  通过一张sim卡
+  添加一条自动化：实现App关闭时关掉Wi-Fi打开蜂窝，编译时能访问到外网校验证书
+  再添加一条自动化...
         </div>
     </a>
     <p class="post-meta">
@@ -594,7 +1104,7 @@ import Foundation
 <hr>
 
 <div class="post-preview">
-    <a href="/2023/08/02/iOS-%E7%BB%84%E4%BB%B6%E5%8C%96%E5%AE%9E%E8%B7%B5%E4%B9%8B-%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98%E5%8F%8A%E8%A7%A3%E5%86%B3%E8%BF%87%E7%A8%8B%E7%BA%AA%E8%A6%81-%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0%E4%B8%AD/">
+    <a href="/zh/iOS-%E7%BB%84%E4%BB%B6%E5%8C%96%E5%AE%9E%E8%B7%B5%E4%B9%8B-%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98%E5%8F%8A%E8%A7%A3%E5%86%B3%E8%BF%87%E7%A8%8B%E7%BA%AA%E8%A6%81-%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0%E4%B8%AD/">
         <h2 class="post-title">
             iOS组件化实践之：遇到的问题及解决过程纪要(持续更新中)
         </h2>
@@ -604,8 +1114,7 @@ import Foundation
         </h3>
         
         <div class="post-content-preview">
-            
-                iOS组件化实践之：遇到的问题及解决过程纪要(持续更新中)
+            iOS组件化实践之：遇到的问题及解决过程纪要(持续更新中)
 
 一、编译错误
 
@@ -613,8 +1122,14 @@ import Foundation
 
 1
 2
-Build service could not create build operation: unknown error while handling message: MsgHandlingError(message: "unable to initiate ...
-            
+Build service could not create build operation: unknown error while handling message: MsgHandlingError(message: "unable to initiate PIF transfer session (operation in progress?)")
+
+
+
+经Google之后，解决方案是要清楚编译构建索引，由于还是比较频繁出现，于是写了个脚本：
+
+1
+2...
         </div>
     </a>
     <p class="post-meta">
@@ -623,17 +1138,508 @@ Build service could not create build operation: unknown error while handling mes
 </div>
 <hr>
 
+<div class="post-preview">
+    <a href="/zh/6-iOS-%E7%BB%84%E4%BB%B6%E5%8C%96-%E5%91%BD%E5%90%8D%E6%B3%A8%E9%87%8A%E7%AF%87/">
+        <h2 class="post-title">
+            iOS组件化实践之：类命名注释篇
+        </h2>
+        
+        <h3 class="post-subtitle">
+            
+        </h3>
+        
+        <div class="post-content-preview">
+            iOS组件化实践之：类命名注释篇
+
+1.问题描述
+
+CocoaPods组件创建时，提供的一个很好的管理命名规范的思路：以统一的命名前缀，一般以项目/组织等缩写作为前缀
+
+组件化规整之后，可能存在的情况是前后的文件命名不一致导致的影响代码易读性、易维护等问题
+
+除此之外，由于代码经由不同人迭代的，甚至不同组织迭代（从外包接手的项目）还存在一些文件注释的注释模板差异的情况
+
+2. 类命名统一
+
+2.1 类重命名之前
+
+需要确认下，当前类或者与之相关的一些类，是否存在于CocoaPods公有源上，如果存在，可以直接通过Pod引入（组件内通过dependency），
+
+举个例子：如果你需要进行重...
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by PaysonChen on July 31, 2023
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/zh/5-iOS%E7%BB%84%E4%BB%B6%E5%8C%96-%E8%B5%84%E6%BA%90%E7%BB%84%E4%BB%B6%E5%BA%93/">
+        <h2 class="post-title">
+            iOS组件化实践之：资源组件库
+        </h2>
+        
+        <h3 class="post-subtitle">
+            
+        </h3>
+        
+        <div class="post-content-preview">
+            iOS组件化实现之：资源组件库
+
+1 资源有哪些
+
+​	笼统的可以说，只要不是代码文件的，都可以算是资源文件，举些例子，包括但不限于：图片、音频、视频、动画、字体、多语言文件(.strings)、各类资源包、内置数据库、二进制加密文件不等
+
+2 为什么要做
+
+​	存在一些可复用的资源，举些例子，包括但不限于：
+
+
+  
+    通用样式图标
+
+    导航条图标、头像、按钮、单/复选框、通用背景图片等
+  
+  
+    通用媒体文件
+
+    通用的点击音效、提示音、过场动画、加载动画等
+  
+  
+    其他通用文件
+
+    城市列表、字体、第三方预置资源等
+  
+
+
+由于部分资...
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by PaysonChen on July 26, 2023
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/zh/4-iOS%E7%BB%84%E4%BB%B6%E5%8C%96%E6%A8%A1%E6%9D%BF/">
+        <h2 class="post-title">
+            iOS组件化实践之：新建一个Pod组件库
+        </h2>
+        
+        <h3 class="post-subtitle">
+            
+        </h3>
+        
+        <div class="post-content-preview">
+            iOS组件化实践之：新建一个Pod组件库
+
+0.背景
+
+在IOS组件化的实践过程中，
+
+
+  规划期间需要对组件进行定义、功能划分、接口设计等
+  实践期间需要对组件进行创建，迁移主工程能力等
+
+
+这过程，就看你需要较为频繁地创建Pod组件库，因此对于了解一下，Pod组件的创建，及其模板的使用与修改，变成较为重要
+
+1. 通过常规模板创建
+
+CocoaPods提供的创建指令：
+
+1
+pod lib create xx
+
+
+通过输出可以看到：
+
+1
+Cloning `https://github.com/CocoaPods/pod-template.git` into `xx`.
+
+
+此命...
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by PaysonChen on July 26, 2023
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/zh/iOS%E7%BB%84%E4%BB%B6%E5%8C%96%E5%AE%9E%E8%B7%B5%E4%BA%8C-%E5%AE%9E%E8%B7%B5%E8%BF%87%E7%A8%8B%E7%A2%B0%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98/">
+        <h2 class="post-title">
+            iOS组件化实践二：实践过程碰到的问题
+        </h2>
+        
+        <h3 class="post-subtitle">
+            
+        </h3>
+        
+        <div class="post-content-preview">
+            1 需求不断插入
+
+1.1问题描述：
+
+​	一般而言，面临需要做组件化的团队，大概率是一个持续迭代的需求的过程，这过程不可避免会遇到业务需求的插入，如何保证即完成业务需求，又实现组件化进程，这是一个需要综合考量的课题。
+
+1.2 问题解决
+
+​	由于需求和迭代与组件化是并行的，因此需要对组件化定义里程碑，每个里程碑对应响应的迭代班车，简而言之，例如：每个月迭代一个版本，组件化可以以月为单位，1～x个月为一个里程碑，每个里程碑跟上一个迭代版本，这样保证班车能带上迭代的业务需求，也能带上组件化里程碑的变更，同时记得同步项目其他团队、例如产品团队、Leader（如有必要）、测试团队（一定要）
+...
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by PaysonChen on July 20, 2023
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/zh/iOS%E7%BB%84%E4%BB%B6%E5%8C%96%E5%AE%9E%E8%B7%B5%E4%B8%80_%E5%BA%8F%E8%A8%80/">
+        <h2 class="post-title">
+            iOS组件化实践一：序言
+        </h2>
+        
+        <h3 class="post-subtitle">
+            
+        </h3>
+        
+        <div class="post-content-preview">
+            序言
+
+过去十几年，国内移动互联网浪潮崛起，移动应用的构建也如雨后春笋，从一开始大约是在2011年业余开发者做一款播放器放到App Store可以产生最多百万月流水[1]， 到现在，满目琳琅到App，珍惜手机空间如金，不肯多装一款普通的App的时代，经历过一波又一波的技术革新，自从CocoaPods于2011年9月1日时编译了第一个公开版本[2]，开启了iOS项目拥有应用级别的依赖管理器到时代。
+
+在移动互联网领域从蓝海变成红海的过程中，项目构建的初期也慢慢从不拘小节的架构转向组件化架构的演进。
+
+1. 不拘小节的架构设计
+
+可以理解为一种为了
+
+
+  一些厂商快速试错，快速投入市场验证...
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by PaysonChen on July 14, 2023
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/zh/Github%E5%A4%9A%E8%B4%A6%E5%8F%B7%E9%85%8D%E7%BD%AESSH/">
+        <h2 class="post-title">
+            Github多账号配置SSH
+        </h2>
+        
+        <h3 class="post-subtitle">
+            
+        </h3>
+        
+        <div class="post-content-preview">
+            0x00 背景
+
+​	有时候需要多个github的账号，比如Github Page，如果有需要开多个可能就需要同时管理多个github账号
+
+0x01 实践
+
+​	在ssh管理上使用常规的config配置文件:
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+# github2
+Host XXX.github.com
+Port 22
+User XXX
+HostName github.com
+PreferredAuthentications publickey
+IdentityFile ~/.ssh/id_rsa_github_XXX
+
+# github 
+...
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by PaysonChen on September 26, 2022
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/zh/App%E7%98%A6%E8%BA%AB%E5%AE%9E%E8%B7%B5%E4%B9%8B%E6%89%B9%E9%87%8F%E8%BD%AC%E6%8D%A2webp/">
+        <h2 class="post-title">
+            App瘦身实践之批量转换webp
+        </h2>
+        
+        <h3 class="post-subtitle">
+            
+        </h3>
+        
+        <div class="post-content-preview">
+            0x00 背景
+
+​	WebP 在各大互联网公司已经使用得很多了。WebP 的优势体现在它具有更优的图像数据压缩算法，能带来更小的图片体积，而且拥有肉眼识别无差异的图像质量；同时具备了无损和有损的压缩模式、Alpha 透明以及动画的特性，在 JPEG 和 PNG 上的转化效果都相当优秀、稳定和统一。
+
+0x01 优势对比
+
+
+  PNG 转 WebP 的压缩率要高于 PNG 原图压缩率，同样支持有损与无损压缩
+  转换后的 WebP 体积大幅减少，图片质量也得到保障（同时肉眼几乎无法看出差异）
+  转换后的 WebP 支持 Alpha 透明和 24-bit 颜色数，不存在 PNG8 色彩...
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by PaysonChen on September 25, 2022
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/zh/iOS-OpenType/">
+        <h2 class="post-title">
+            iOS应用接收文件打开类型
+        </h2>
+        
+        <h3 class="post-subtitle">
+            
+        </h3>
+        
+        <div class="post-content-preview">
+            0x00 背景
+
+​	K歌音频上传工具1.0需求调研，在探索上传的几种方式当中，涉及到引导用户从QQ微信打开，并提供能力。这就牵涉到从其他应用讲音视频文件导入（打开/传入）到K歌的需要。
+
+0x01 技术方案
+
+​	通过设置Xcode Document Types，可以设置项目可接收的文件类型，附带一份：官方提供的文件类型列表。
+
+​	
+
+0x02 项目实现
+
+当前iOS应用的生命周期管理有以下两种方式
+
+
+  
+    UIApplicationDelegate
+
+    iOS13之前，Appdelegate的职责全权处理App生命周期和UI生命周期：
+
+    
+
+    在不需要...
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by PaysonChen on January 19, 2022
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/zh/git/">
+        <h2 class="post-title">
+            多账号配置GIT
+        </h2>
+        
+        <h3 class="post-subtitle">
+            
+        </h3>
+        
+        <div class="post-content-preview">
+            1、常规多账号
+
+不同host的代码仓库之间的多账号SSH配置，网上的资料很多，这里简单找一个 配置多个SSH。
+
+2、多个Github账号
+
+由于申请了多个域名，配置同一个github账号下的gitpage出现了异常，我想大概也是因为CNAME或者其他原因。尝试重新申请一个github账号分开管理也行。
+
+之前账号github是用ssh配置的，新账号也尝试用ssh配置，
+
+重新生成新的ssk-key，也配置了config文件
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+# github2
+Host a.github.com
+Port 22
+User ...
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by PaysonChen on October 18, 2021
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/zh/crash/">
+        <h2 class="post-title">
+            iOS 10.x 内存Crash 排查 纪要
+        </h2>
+        
+        <h3 class="post-subtitle">
+            This is a subtitle
+        </h3>
+        
+        <div class="post-content-preview">
+            更新日期：2021-09-07
+
+[TOC]
+
+1、基本情况
+
+​	最终堆栈位置：
+
+1
+2
+3
+XXX -[KSKitBaseModel encodeWithCoder:] (KSKitBaseModel.m:)
+XXX -[KSBaseModel encodeWithCoder:] (KSBaseModel.m:)
+XXX -[KSBaseModel encodeWithCoder:] (KSBaseModel.m:)
+
+
+2、分析
+
+2.1 堆栈分析
+
+跟踪多条Crash堆栈
+
+XXX堆栈 1：
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+9 XXX 0x0000000103bf4...
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by PaysonChen on September 13, 2021
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/zh/new-post/">
+        <h2 class="post-title">
+            Jenkins迁移
+        </h2>
+        
+        <h3 class="post-subtitle">
+            This is a subtitle
+        </h3>
+        
+        <div class="post-content-preview">
+            1、Jenkins迁移目录
+
+1.1 Jenkins安装后的目录
+
+Jenkins的安装不再赘述可以参考https://www.jenkins.io/zh/doc/book/installing/，
+
+安装完之后Jenkins的目录是隐藏目录，可以通过命令行显示
+
+1
+2
+3
+defaults write com.apple.finder AppleShowAllFiles -boolean true 
+killall Finder
+
+
+
+1.2 jobs
+
+jobs目录为Jenkins存储【项目配置】及【构建历史】的文件夹，
+
+
+
+config.xml为项目配置
+
+builds为构建历...
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by PaysonChen on June 20, 2021
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/zh/rn___/">
+        <h2 class="post-title">
+            RN 采坑
+        </h2>
+        
+        <div class="post-content-preview">
+            RN 报如下错误时
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+
+ resolve try the following:
+
+  1. Clear watchman watches: `watchman watch-del-all`.
+
+  2. Delete the `node_modules` folder: `rm -rf node_modules &amp;&amp; npm install`. 
+
+ 3. Reset Metro Bundler cache: `rm -rf $TMPDIR/react-*` or `npm start -- --reset-cache`. ...
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by PaysonChen Blog on March 21, 2021
+    </p>
+</div>
+<hr>
+
 
 <!-- Pager -->
-
-<ul class="pager">
-    
-    
-    <li class="next">
-        <a href="/page2">Older Posts &rarr;</a>
-    </li>
-    
-</ul>
 
 
     		</div>
@@ -718,7 +1724,7 @@ Build service could not create build operation: unknown error while handling mes
 </ul>
 
                 <p class="copyright text-muted">
-                    Copyright &copy; PaysonChen Blog 2024
+                    Copyright &copy; PaysonChen Blog 2025
                     <br>
                     <!-- Powered by <a href="http://huangxuan.me">Hux Blog</a> | -->
                  <!--    <iframe style="margin-left: 2px; margin-bottom:-5px;" frameborder="0" scrolling="0" width="100px"
