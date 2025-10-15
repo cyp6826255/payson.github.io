@@ -1,1 +1,1 @@
-Hi, I am chenyanpeng
+​	Payson holds a bachelor's degree in engineering. He is a former senior engineer at Tencent and currently a senior engineer at CATL. With over 10 years of experience in the mobile internet sector, he possesses a rich technical stack across all front-end, mid-end, and back-end platforms. He has extensive experience in developing large-scale mobile internet products, as well as building them from scratch.
